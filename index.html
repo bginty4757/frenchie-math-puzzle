@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frenchie Math Puzzle 🐾</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    background: linear-gradient(135deg, #ffe0f0 0%, #e0f0ff 50%, #f0ffe0 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  h1 {
+    font-size: clamp(1.4rem, 5vw, 2.2rem);
+    color: #7c3aed;
+    text-shadow: 2px 2px 0 #f9a8d4;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .score-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 1rem;
+    color: #374151;
+    background: white;
+    padding: 8px 20px;
+    border-radius: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .score-bar span { font-weight: bold; }
+  .pieces-count { color: #7c3aed; font-size: 1.15rem; }
+  .streak { color: #f59e0b; }
+
+  /* ── MAIN LAYOUT ── */
+  .main-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 960px;
+  }
+
+  /* ── PUZZLE BOARD ── */
+  .puzzle-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .puzzle-label {
+    font-size: 0.95rem;
+    color: #6b7280;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .puzzle-container {
+    position: relative;
+    width: 500px;
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    border: 4px solid #7c3aed;
+    background: #f3f4f6;
+  }
+
+  /* SVG dog fills the full container */
+  .dog-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* Puzzle overlay */
+  .puzzle-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+  }
+
+  .piece {
+    background: #c4b5fd;
+    border: 1.5px solid #7c3aed;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+  }
+
+  .piece.revealed {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .piece.pop {
+    animation: popOff 0.6s ease forwards;
+  }
+
+  @keyframes popOff {
+    0%   { opacity: 1; transform: scale(1); }
+    50%  { opacity: 0.6; transform: scale(1.3) rotate(8deg); }
+    100% { opacity: 0; transform: scale(0); }
+  }
+
+  /* Paw print on each covered piece */
+  .piece::after {
+    content: '🐾';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    font-size: clamp(6px, 1.2vw, 12px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── MATH PANEL ── */
+  .math-panel {
+    background: white;
+    border-radius: 20px;
+    padding: 24px 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13);
+    border: 3px solid #f9a8d4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    min-width: 260px;
+    max-width: 320px;
+    flex: 1;
+  }
+
+  .math-title {
+    font-size: 1.1rem;
+    color: #7c3aed;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .question-badge {
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    color: #1e293b;
+    font-weight: bold;
+    text-align: center;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #ede9fe, #fce7f3);
+    border-radius: 16px;
+    letter-spacing: 2px;
+    min-width: 180px;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.07);
+  }
+
+  .answer-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .answer-input {
+    width: 90px;
+    font-size: 1.7rem;
+    font-family: inherit;
+    text-align: center;
+    border: 3px solid #c4b5fd;
+    border-radius: 12px;
+    padding: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    background: #faf5ff;
+  }
+  .answer-input:focus { border-color: #7c3aed; }
+  .answer-input.wrong { border-color: #ef4444; animation: shake 0.35s; }
+  .answer-input.right { border-color: #22c55e; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    40%      { transform: translateX(8px); }
+    60%      { transform: translateX(-6px); }
+    80%      { transform: translateX(6px); }
+  }
+
+  .submit-btn {
+    font-family: inherit;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 22px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(124,58,237,0.35);
+    transition: transform 0.1s, box-shadow 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(124,58,237,0.45); }
+  .submit-btn:active { transform: translateY(0); }
+
+  .feedback {
+    font-size: 1.05rem;
+    font-weight: bold;
+    min-height: 28px;
+    text-align: center;
+    transition: opacity 0.3s;
+  }
+  .feedback.good { color: #16a34a; }
+  .feedback.bad  { color: #dc2626; }
+
+  .hint-btn {
+    font-family: inherit;
+    font-size: 0.82rem;
+    background: none;
+    border: 2px dashed #c4b5fd;
+    color: #7c3aed;
+    border-radius: 8px;
+    padding: 4px 14px;
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  .hint-btn:hover { opacity: 1; background: #faf5ff; }
+
+  .hint-text {
+    font-size: 0.85rem;
+    color: #6b7280;
+    min-height: 20px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    width: 100%;
+  }
+  .progress-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+  .progress-track {
+    width: 100%;
+    height: 14px;
+    background: #e9d5ff;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #a855f7, #ec4899);
+    border-radius: 7px;
+    transition: width 0.5s ease;
+  }
+
+  /* ── CELEBRATION ── */
+  #celebration {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  #celebration.show { display: flex; }
+
+  .celeb-box {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 36px;
+    text-align: center;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border: 4px solid #f9a8d4;
+    animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes bounceIn {
+    from { transform: scale(0.4); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .celeb-box h2 { font-size: 2.2rem; color: #7c3aed; margin-bottom: 12px; }
+  .celeb-box p  { font-size: 1.1rem; color: #374151; margin-bottom: 20px; line-height: 1.5; }
+  .celeb-dog    { font-size: 5rem; margin-bottom: 8px; }
+  .play-again-btn {
+    font-family: inherit;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 36px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 6px 18px rgba(239,68,68,0.35);
+    letter-spacing: 0.5px;
+    transition: transform 0.1s;
+  }
+  .play-again-btn:hover { transform: translateY(-2px); }
+
+  .confetti-canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  @media (max-width: 600px) {
+    .puzzle-container { width: 340px; height: 272px; }
+  }
+  @media (max-width: 380px) {
+    .puzzle-container { width: 290px; height: 232px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🐾 Frenchie Math Puzzle 🐾</h1>
+
+<div class="score-bar">
+  <div>Pieces found: <span class="pieces-count" id="piecesCount">0 / 50</span></div>
+  <div>⭐ Score: <span id="scoreVal">0</span></div>
+  <div>🔥 Streak: <span class="streak" id="streakVal">0</span></div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- PUZZLE -->
+  <div class="puzzle-section">
+    <div class="puzzle-label">🧩 Complete the Frenchie! 🧩</div>
+    <div class="puzzle-container" id="puzzleContainer">
+      <!-- French Bulldog SVG -->
+      <svg class="dog-svg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sky/background -->
+        <rect width="500" height="400" fill="#d4eaff"/>
+        <!-- Grass -->
+        <ellipse cx="250" cy="400" rx="300" ry="80" fill="#86efac"/>
+        <rect x="0" y="360" width="500" height="40" fill="#86efac"/>
+
+        <!-- Body (brindle pattern base) -->
+        <ellipse cx="250" cy="290" rx="115" ry="90" fill="#a3785a"/>
+        <!-- Brindle stripes on body -->
+        <ellipse cx="235" cy="260" rx="18" ry="55" fill="#7a5a3f" opacity="0.35"/>
+        <ellipse cx="265" cy="275" rx="14" ry="48" fill="#5c3d20" opacity="0.25"/>
+        <ellipse cx="295" cy="268" rx="10" ry="42" fill="#7a5a3f" opacity="0.25"/>
+        <ellipse cx="210" cy="272" rx="10" ry="40" fill="#5c3d20" opacity="0.22"/>
+
+        <!-- White chest patch -->
+        <ellipse cx="250" cy="310" rx="55" ry="55" fill="#f5f0eb"/>
+        <ellipse cx="250" cy="330" rx="45" ry="38" fill="#ede8e3"/>
+
+        <!-- Tail -->
+        <path d="M355 310 Q390 280 380 250 Q370 225 360 240 Q365 260 355 285 Z" fill="#a3785a"/>
+
+        <!-- Front legs -->
+        <rect x="195" y="345" width="30" height="50" rx="12" fill="#a3785a"/>
+        <rect x="275" y="345" width="30" height="50" rx="12" fill="#a3785a"/>
+        <!-- Paws -->
+        <ellipse cx="210" cy="398" rx="20" ry="10" fill="#8b6545"/>
+        <ellipse cx="290" cy="398" rx="20" ry="10" fill="#8b6545"/>
+        <!-- Paw toes front -->
+        <ellipse cx="200" cy="398" rx="7" ry="6" fill="#7a5535"/>
+        <ellipse cx="210" cy="400" rx="7" ry="6" fill="#7a5535"/>
+        <ellipse cx="220" cy="398" rx="7" ry="6" fill="#7a5535"/>
+        <ellipse cx="280" cy="398" rx="7" ry="6" fill="#7a5535"/>
+        <ellipse cx="290" cy="400" rx="7" ry="6" fill="#7a5535"/>
+        <ellipse cx="300" cy="398" rx="7" ry="6" fill="#7a5535"/>
+
+        <!-- Back legs -->
+        <ellipse cx="175" cy="355" rx="28" ry="20" fill="#9a7050"/>
+        <ellipse cx="325" cy="355" rx="28" ry="20" fill="#9a7050"/>
+
+        <!-- Neck -->
+        <ellipse cx="250" cy="225" rx="55" ry="40" fill="#a3785a"/>
+
+        <!-- HEAD - big round French Bulldog head -->
+        <circle cx="250" cy="175" r="90" fill="#b8896a"/>
+
+        <!-- Brindle on head -->
+        <ellipse cx="230" cy="148" rx="16" ry="38" fill="#7a5a3f" opacity="0.3"/>
+        <ellipse cx="268" cy="155" rx="13" ry="32" fill="#5c3d20" opacity="0.22"/>
+        <ellipse cx="295" cy="165" rx="9" ry="25" fill="#7a5a3f" opacity="0.2"/>
+
+        <!-- White face mask -->
+        <ellipse cx="250" cy="200" rx="58" ry="52" fill="#f0ebe5"/>
+        <ellipse cx="250" cy="210" rx="52" ry="44" fill="#ede5dc"/>
+
+        <!-- EARS - big French Bulldog bat ears -->
+        <!-- Left ear -->
+        <path d="M168 120 Q130 60 158 30 Q182 15 200 55 Q215 85 205 115 Z" fill="#a3785a"/>
+        <path d="M175 115 Q148 72 163 48 Q180 30 195 60 Q207 83 200 110 Z" fill="#d4846a"/>
+        <!-- Right ear -->
+        <path d="M332 120 Q370 60 342 30 Q318 15 300 55 Q285 85 295 115 Z" fill="#a3785a"/>
+        <path d="M325 115 Q352 72 337 48 Q320 30 305 60 Q293 83 300 110 Z" fill="#d4846a"/>
+
+        <!-- Ear inner details -->
+        <path d="M178 112 Q155 78 165 55 Q178 38 192 63 Q202 82 198 108 Z" fill="#c97060" opacity="0.5"/>
+        <path d="M322 112 Q345 78 335 55 Q322 38 308 63 Q298 82 302 108 Z" fill="#c97060" opacity="0.5"/>
+
+        <!-- EYES -->
+        <!-- Eye whites -->
+        <ellipse cx="215" cy="165" rx="22" ry="20" fill="white"/>
+        <ellipse cx="285" cy="165" rx="22" ry="20" fill="white"/>
+        <!-- Irises - big dark brown eyes -->
+        <circle cx="216" cy="166" r="15" fill="#3d1c08"/>
+        <circle cx="284" cy="166" r="15" fill="#3d1c08"/>
+        <!-- Pupils -->
+        <circle cx="217" cy="167" r="9" fill="#1a0a02"/>
+        <circle cx="283" cy="167" r="9" fill="#1a0a02"/>
+        <!-- Eye shine -->
+        <circle cx="221" cy="161" r="4" fill="white" opacity="0.9"/>
+        <circle cx="287" cy="161" r="4" fill="white" opacity="0.9"/>
+        <circle cx="225" cy="167" r="2" fill="white" opacity="0.6"/>
+        <circle cx="291" cy="167" r="2" fill="white" opacity="0.6"/>
+        <!-- Eyelashes top -->
+        <path d="M197 152 Q205 145 215 148" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M205 148 Q210 140 218 144" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M273 148 Q278 140 282 144" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M281 148 Q288 142 296 148" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Eyebrows (expressive) -->
+        <path d="M196 148 Q215 136 234 142" stroke="#5c3d20" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M266 142 Q285 136 304 148" stroke="#5c3d20" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+        <!-- Wrinkle lines on forehead -->
+        <path d="M235 140 Q250 132 265 140" stroke="#8b6040" stroke-width="2" fill="none" opacity="0.6"/>
+        <path d="M228 148 Q250 140 272 148" stroke="#8b6040" stroke-width="1.5" fill="none" opacity="0.4"/>
+
+        <!-- NOSE - big flat French Bulldog snout/muzzle -->
+        <ellipse cx="250" cy="205" rx="42" ry="32" fill="#d4b49a"/>
+        <!-- Muzzle detail wrinkle -->
+        <path d="M215 196 Q250 188 285 196" stroke="#b89070" stroke-width="2" fill="none" opacity="0.6"/>
+
+        <!-- Nose tip -->
+        <ellipse cx="250" cy="197" rx="26" ry="18" fill="#2d1810"/>
+        <!-- Nose highlights -->
+        <ellipse cx="241" cy="192" rx="7" ry="5" fill="#4a2820" opacity="0.6"/>
+        <ellipse cx="258" cy="191" rx="7" ry="5" fill="#4a2820" opacity="0.6"/>
+        <ellipse cx="244" cy="190" rx="4" ry="3" fill="#8a5040" opacity="0.7"/>
+        <!-- Nose shine -->
+        <ellipse cx="258" cy="193" rx="5" ry="4" fill="white" opacity="0.3"/>
+
+        <!-- Nostrils -->
+        <ellipse cx="237" cy="199" rx="8" ry="7" fill="#1a0c06"/>
+        <ellipse cx="263" cy="199" rx="8" ry="7" fill="#1a0c06"/>
+
+        <!-- MOUTH -->
+        <path d="M232 218 Q250 230 268 218" stroke="#8b4a35" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- Smile lines from corners -->
+        <path d="M232 218 Q226 224 228 230" stroke="#8b4a35" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M268 218 Q274 224 272 230" stroke="#8b4a35" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Tongue peeking out -->
+        <ellipse cx="250" cy="232" rx="16" ry="12" fill="#f87171"/>
+        <ellipse cx="250" cy="235" rx="16" ry="10" fill="#f87171"/>
+        <path d="M234 230 Q250 242 266 230" fill="#ef4444"/>
+        <!-- Tongue center line -->
+        <path d="M250 228 Q250 241 250 241" stroke="#dc2626" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Tongue shine -->
+        <ellipse cx="244" cy="231" rx="5" ry="4" fill="#fca5a5" opacity="0.7"/>
+
+        <!-- Cheek blush -->
+        <ellipse cx="192" cy="192" rx="22" ry="14" fill="#f9a8d4" opacity="0.45"/>
+        <ellipse cx="308" cy="192" rx="22" ry="14" fill="#f9a8d4" opacity="0.45"/>
+
+        <!-- Chin wrinkle -->
+        <path d="M225 240 Q250 248 275 240" stroke="#c4936a" stroke-width="2" fill="none" opacity="0.5"/>
+
+        <!-- Collar -->
+        <rect x="200" y="248" width="100" height="20" rx="8" fill="#ec4899"/>
+        <rect x="205" y="250" width="90" height="16" rx="6" fill="#f472b6"/>
+        <!-- Collar tag -->
+        <circle cx="250" cy="270" r="10" fill="#fbbf24"/>
+        <circle cx="250" cy="270" r="7" fill="#f59e0b"/>
+        <text x="250" y="274" text-anchor="middle" font-size="8" fill="white" font-weight="bold">♥</text>
+        <!-- Collar studs -->
+        <circle cx="220" cy="258" r="4" fill="#fbbf24"/>
+        <circle cx="235" cy="258" r="4" fill="#fbbf24"/>
+        <circle cx="265" cy="258" r="4" fill="#fbbf24"/>
+        <circle cx="280" cy="258" r="4" fill="#fbbf24"/>
+
+        <!-- Flower / bow on collar -->
+        <circle cx="185" cy="258" r="8" fill="#a855f7"/>
+        <circle cx="178" cy="252" r="6" fill="#c084fc"/>
+        <circle cx="192" cy="252" r="6" fill="#c084fc"/>
+        <circle cx="178" cy="264" r="6" fill="#c084fc"/>
+        <circle cx="192" cy="264" r="6" fill="#c084fc"/>
+        <circle cx="185" cy="258" r="5" fill="#fde68a"/>
+
+        <!-- Some floating hearts / stars around the dog -->
+        <text x="70" y="100" font-size="24" opacity="0.6">💕</text>
+        <text x="390" y="90" font-size="22" opacity="0.6">⭐</text>
+        <text x="55" y="280" font-size="18" opacity="0.55">🌸</text>
+        <text x="410" y="285" font-size="18" opacity="0.55">🌸</text>
+        <text x="90" y="180" font-size="16" opacity="0.5">✨</text>
+        <text x="395" y="185" font-size="16" opacity="0.5">✨</text>
+
+        <!-- Grass details -->
+        <path d="M30 360 Q40 340 50 360" stroke="#4ade80" stroke-width="3" fill="none"/>
+        <path d="M60 365 Q68 348 76 365" stroke="#4ade80" stroke-width="3" fill="none"/>
+        <path d="M420 362 Q430 344 440 362" stroke="#4ade80" stroke-width="3" fill="none"/>
+        <path d="M450 358 Q458 342 466 358" stroke="#4ade80" stroke-width="3" fill="none"/>
+        <path d="M140 370 Q148 355 156 370" stroke="#4ade80" stroke-width="2.5" fill="none"/>
+        <path d="M350 368 Q358 353 366 368" stroke="#4ade80" stroke-width="2.5" fill="none"/>
+      </svg>
+
+      <!-- Puzzle piece overlay -->
+      <div class="puzzle-overlay" id="puzzleOverlay"></div>
+    </div>
+  </div>
+
+  <!-- MATH PANEL -->
+  <div class="math-panel">
+    <div class="math-title">🧮 Solve to Reveal a Piece!</div>
+
+    <div class="question-badge" id="questionBadge">?</div>
+
+    <div class="answer-row">
+      <input
+        class="answer-input"
+        type="number"
+        id="answerInput"
+        placeholder="?"
+        min="0"
+        max="200"
+        autocomplete="off"
+      />
+      <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">✓ GO!</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <button class="hint-btn" onclick="showHint()">💡 Hint</button>
+    <div class="hint-text" id="hintText"></div>
+
+    <div class="progress-wrap">
+      <div class="progress-label" id="progressLabel">0 of 50 pieces found</div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Celebration overlay -->
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+<div id="celebration">
+  <div class="celeb-box">
+    <div class="celeb-dog">🐶</div>
+    <h2>🎉 You Did It! 🎉</h2>
+    <p>Wow, you revealed the whole Frenchie!<br>
+      You solved <strong>50 math problems</strong>!<br>
+      Score: <strong id="finalScore">0</strong> ⭐</p>
+    <button class="play-again-btn" onclick="resetGame()">🔄 Play Again!</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  GAME STATE
+// ─────────────────────────────────────────────
+const TOTAL_PIECES = 50;
+let piecesRevealed = 0;
+let score = 0;
+let streak = 0;
+let currentAnswer = 0;
+let currentQuestion = '';
+let currentHint = '';
+let wrongAttempts = 0;
+let usedQuestions = new Set();
+
+// ─────────────────────────────────────────────
+//  QUESTION GENERATION
+// ─────────────────────────────────────────────
+function generateQuestion() {
+  wrongAttempts = 0;
+  let q, a, hint;
+  let key;
+
+  // Alternate between multiplication and subtraction, weighted slightly toward variety
+  const type = Math.random() < 0.5 ? 'mult' : 'sub';
+
+  // Try to pick a question we haven't used recently (up to 20 attempts)
+  let attempts = 0;
+  do {
+    if (type === 'mult') {
+      const a1 = Math.floor(Math.random() * 9) + 1; // 1-9
+      const a2 = Math.floor(Math.random() * 9) + 1; // 1-9
+      q = `${a1} × ${a2} = ?`;
+      a = a1 * a2;
+      hint = `Count by ${a1}'s, ${a2} times`;
+      key = `m${a1}x${a2}`;
+    } else {
+      const minuend = Math.floor(Math.random() * 81) + 10; // 10-90 (double digit)
+      const subtrahend = Math.floor(Math.random() * 9) + 1; // 1-9
+      const result = minuend - subtrahend;
+      if (result < 0) { attempts++; continue; }
+      q = `${minuend} − ${subtrahend} = ?`;
+      a = result;
+      hint = `Start at ${minuend}, count back ${subtrahend}`;
+      key = `s${minuend}-${subtrahend}`;
+    }
+    attempts++;
+  } while (usedQuestions.has(key) && attempts < 20);
+
+  usedQuestions.add(key);
+  // Keep the set from growing too large
+  if (usedQuestions.size > 60) {
+    const [first] = usedQuestions;
+    usedQuestions.delete(first);
+  }
+
+  currentQuestion = q;
+  currentAnswer = a;
+  currentHint = hint;
+  currentHint = hint;
+
+  document.getElementById('questionBadge').textContent = q;
+  document.getElementById('hintText').textContent = '';
+  const inp = document.getElementById('answerInput');
+  inp.value = '';
+  inp.className = 'answer-input';
+  inp.focus();
+  setFeedback('', '');
+}
+
+// ─────────────────────────────────────────────
+//  PUZZLE BOARD SETUP
+// ─────────────────────────────────────────────
+const pieceOrder = Array.from({length: TOTAL_PIECES}, (_, i) => i);
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+let revealQueue = [];
+
+function buildPuzzle() {
+  const overlay = document.getElementById('puzzleOverlay');
+  overlay.innerHTML = '';
+  for (let i = 0; i < TOTAL_PIECES; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'piece';
+    piece.id = `piece-${i}`;
+    overlay.appendChild(piece);
+  }
+  revealQueue = shuffleArray([...pieceOrder]);
+}
+
+function revealNextPiece() {
+  if (revealQueue.length === 0) return;
+  const idx = revealQueue.pop();
+  const piece = document.getElementById(`piece-${idx}`);
+  if (piece) {
+    piece.classList.add('pop');
+    setTimeout(() => piece.classList.add('revealed'), 600);
+  }
+  piecesRevealed++;
+  updateUI();
+  if (piecesRevealed >= TOTAL_PIECES) {
+    setTimeout(showCelebration, 700);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  CHECK ANSWER
+// ─────────────────────────────────────────────
+function checkAnswer() {
+  const inp = document.getElementById('answerInput');
+  const val = parseInt(inp.value, 10);
+
+  if (isNaN(val)) {
+    setFeedback('Type a number first! 🤔', 'bad');
+    inp.classList.add('wrong');
+    setTimeout(() => inp.classList.remove('wrong'), 500);
+    return;
+  }
+
+  if (val === currentAnswer) {
+    // Correct!
+    streak++;
+    const bonus = streak >= 3 ? Math.floor(streak / 3) : 0;
+    score += 10 + bonus * 5;
+
+    let msg = '✅ Correct! ';
+    if (streak >= 5) msg += '🔥 HOT STREAK! +' + (10 + bonus * 5) + ' pts!';
+    else if (streak >= 3) msg += '⭐ Nice streak! +' + (10 + bonus * 5) + ' pts!';
+    else msg += '+10 pts!';
+
+    setFeedback(msg, 'good');
+    inp.className = 'answer-input right';
+    revealNextPiece();
+    setTimeout(() => {
+      inp.className = 'answer-input';
+      generateQuestion();
+    }, 800);
+  } else {
+    // Wrong
+    wrongAttempts++;
+    streak = 0;
+    setFeedback(`❌ Try again! (Attempt ${wrongAttempts})`, 'bad');
+    inp.className = 'answer-input wrong';
+    setTimeout(() => inp.classList.remove('wrong'), 400);
+    if (wrongAttempts >= 2) {
+      document.getElementById('hintText').textContent = '💡 ' + currentHint;
+    }
+    inp.value = '';
+  }
+
+  updateUI();
+}
+
+function showHint() {
+  document.getElementById('hintText').textContent = '💡 ' + currentHint;
+}
+
+function setFeedback(msg, type) {
+  const el = document.getElementById('feedback');
+  el.textContent = msg;
+  el.className = 'feedback ' + type;
+}
+
+function updateUI() {
+  document.getElementById('piecesCount').textContent = `${piecesRevealed} / ${TOTAL_PIECES}`;
+  document.getElementById('scoreVal').textContent = score;
+  document.getElementById('streakVal').textContent = streak;
+  const pct = (piecesRevealed / TOTAL_PIECES) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${piecesRevealed} of ${TOTAL_PIECES} pieces found`;
+}
+
+// ─────────────────────────────────────────────
+//  CELEBRATION + CONFETTI
+// ─────────────────────────────────────────────
+function showCelebration() {
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('celebration').classList.add('show');
+  launchConfetti();
+}
+
+// Simple confetti engine
+const confettiColors = ['#f87171','#fb923c','#fbbf24','#4ade80','#60a5fa','#a78bfa','#f472b6'];
+let confettiParticles = [];
+let confettiAF = null;
+
+function launchConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  confettiParticles = [];
+  for (let i = 0; i < 160; i++) {
+    confettiParticles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 10 + 6,
+      h: Math.random() * 5 + 4,
+      color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+      vx: (Math.random() - 0.5) * 3,
+      vy: Math.random() * 4 + 2,
+      angle: Math.random() * 360,
+      spin: (Math.random() - 0.5) * 6,
+    });
+  }
+  if (confettiAF) cancelAnimationFrame(confettiAF);
+  animateConfetti();
+}
+
+function animateConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  confettiParticles.forEach(p => {
+    ctx.save();
+    ctx.translate(p.x + p.w / 2, p.y + p.h / 2);
+    ctx.rotate(p.angle * Math.PI / 180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    ctx.restore();
+    p.x += p.vx;
+    p.y += p.vy;
+    p.angle += p.spin;
+    if (p.y > canvas.height) {
+      p.y = -20;
+      p.x = Math.random() * canvas.width;
+    }
+  });
+  confettiAF = requestAnimationFrame(animateConfetti);
+}
+
+// ─────────────────────────────────────────────
+//  RESET
+// ─────────────────────────────────────────────
+function resetGame() {
+  piecesRevealed = 0;
+  score = 0;
+  streak = 0;
+  usedQuestions.clear();
+
+  document.getElementById('celebration').classList.remove('show');
+  if (confettiAF) { cancelAnimationFrame(confettiAF); confettiAF = null; }
+  const canvas = document.getElementById('confettiCanvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+  updateUI();
+  buildPuzzle();
+  generateQuestion();
+}
+
+// ─────────────────────────────────────────────
+//  KEYBOARD ENTER TO SUBMIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('answerInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkAnswer();
+  });
+  buildPuzzle();
+  generateQuestion();
+});
+</script>
+</body>
+</html>
