@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Frenchie Math Puzzle 🐾</title>
+<title>Puppy Math Puzzles 🐾</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,22 +15,34 @@
     flex-direction: column;
     align-items: center;
     padding: 16px;
-    gap: 16px;
+    gap: 14px;
+    transition: background 1s ease;
   }
 
   h1 {
-    font-size: clamp(1.4rem, 5vw, 2.2rem);
+    font-size: clamp(1.3rem, 4.5vw, 2rem);
     color: #7c3aed;
     text-shadow: 2px 2px 0 #f9a8d4;
     text-align: center;
     letter-spacing: 1px;
   }
 
+  .dog-banner {
+    font-size: clamp(0.85rem, 3vw, 1.1rem);
+    color: white;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    padding: 6px 22px;
+    border-radius: 20px;
+    box-shadow: 0 3px 10px rgba(124,58,237,0.35);
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
   .score-bar {
     display: flex;
     align-items: center;
-    gap: 16px;
-    font-size: 1rem;
+    gap: 14px;
+    font-size: 0.95rem;
     color: #374151;
     background: white;
     padding: 8px 20px;
@@ -39,56 +51,50 @@
     flex-wrap: wrap;
     justify-content: center;
   }
-
   .score-bar span { font-weight: bold; }
-  .pieces-count { color: #7c3aed; font-size: 1.15rem; }
+  .pieces-count { color: #7c3aed; font-size: 1.1rem; }
   .streak { color: #f59e0b; }
+  .puzzle-num { color: #ec4899; }
 
-  /* ── MAIN LAYOUT ── */
   .main-wrap {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 18px;
     justify-content: center;
     align-items: flex-start;
     width: 100%;
-    max-width: 960px;
+    max-width: 980px;
   }
 
-  /* ── PUZZLE BOARD ── */
+  /* ── PUZZLE ── */
   .puzzle-section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
-
   .puzzle-label {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: #6b7280;
     font-weight: bold;
     letter-spacing: 1px;
   }
-
   .puzzle-container {
     position: relative;
     width: 500px;
     height: 400px;
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22);
     border: 4px solid #7c3aed;
     background: #f3f4f6;
+    transition: border-color 0.8s ease;
   }
-
-  /* SVG dog fills the full container */
   .dog-svg {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
   }
-
-  /* Puzzle overlay */
   .puzzle-overlay {
     position: absolute;
     top: 0; left: 0;
@@ -97,433 +103,186 @@
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(5, 1fr);
   }
-
   .piece {
     background: #c4b5fd;
     border: 1.5px solid #7c3aed;
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition: opacity 0.5s ease, transform 0.5s ease;
     position: relative;
     overflow: hidden;
-    cursor: default;
   }
-
-  .piece.revealed {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .piece.pop {
-    animation: popOff 0.6s ease forwards;
-  }
-
+  .piece.revealed { opacity: 0; pointer-events: none; }
+  .piece.pop { animation: popOff 0.55s ease forwards; }
   @keyframes popOff {
-    0%   { opacity: 1; transform: scale(1); }
-    50%  { opacity: 0.6; transform: scale(1.3) rotate(8deg); }
-    100% { opacity: 0; transform: scale(0); }
+    0%   { opacity:1; transform:scale(1); }
+    50%  { opacity:0.6; transform:scale(1.3) rotate(8deg); }
+    100% { opacity:0; transform:scale(0); }
   }
-
-  /* Paw print on each covered piece */
   .piece::after {
     content: '🐾';
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    font-size: clamp(6px, 1.2vw, 12px);
-    opacity: 0.5;
-    pointer-events: none;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    font-size: clamp(6px,1.2vw,11px);
+    opacity:0.5;
+    pointer-events:none;
   }
 
   /* ── MATH PANEL ── */
   .math-panel {
     background: white;
     border-radius: 20px;
-    padding: 24px 20px;
+    padding: 22px 18px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.13);
     border: 3px solid #f9a8d4;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 18px;
-    min-width: 260px;
-    max-width: 320px;
+    gap: 16px;
+    min-width: 250px;
+    max-width: 310px;
     flex: 1;
   }
-
-  .math-title {
-    font-size: 1.1rem;
-    color: #7c3aed;
-    font-weight: bold;
-    text-align: center;
-  }
-
+  .math-title { font-size:1rem; color:#7c3aed; font-weight:bold; text-align:center; }
   .question-badge {
-    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    font-size: clamp(1.7rem,5.5vw,2.7rem);
     color: #1e293b;
     font-weight: bold;
     text-align: center;
-    padding: 16px 24px;
+    padding: 14px 22px;
     background: linear-gradient(135deg, #ede9fe, #fce7f3);
     border-radius: 16px;
     letter-spacing: 2px;
-    min-width: 180px;
+    min-width: 175px;
     box-shadow: inset 0 2px 8px rgba(0,0,0,0.07);
   }
-
-  .answer-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
+  .answer-row { display:flex; gap:10px; align-items:center; }
   .answer-input {
-    width: 90px;
-    font-size: 1.7rem;
-    font-family: inherit;
-    text-align: center;
-    border: 3px solid #c4b5fd;
-    border-radius: 12px;
-    padding: 8px;
-    outline: none;
-    transition: border-color 0.2s;
-    background: #faf5ff;
+    width:85px;
+    font-size:1.6rem;
+    font-family:inherit;
+    text-align:center;
+    border:3px solid #c4b5fd;
+    border-radius:12px;
+    padding:7px;
+    outline:none;
+    transition:border-color 0.2s;
+    background:#faf5ff;
   }
-  .answer-input:focus { border-color: #7c3aed; }
-  .answer-input.wrong { border-color: #ef4444; animation: shake 0.35s; }
-  .answer-input.right { border-color: #22c55e; }
-
+  .answer-input:focus { border-color:#7c3aed; }
+  .answer-input.wrong { border-color:#ef4444; animation:shake 0.35s; }
+  .answer-input.right { border-color:#22c55e; }
   @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20%      { transform: translateX(-8px); }
-    40%      { transform: translateX(8px); }
-    60%      { transform: translateX(-6px); }
-    80%      { transform: translateX(6px); }
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)}
+    60%{transform:translateX(-6px)}
+    80%{transform:translateX(6px)}
   }
-
   .submit-btn {
-    font-family: inherit;
-    font-size: 1.1rem;
-    background: linear-gradient(135deg, #7c3aed, #a855f7);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 22px;
-    cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 4px 12px rgba(124,58,237,0.35);
-    transition: transform 0.1s, box-shadow 0.1s;
-    letter-spacing: 0.5px;
+    font-family:inherit;
+    font-size:1rem;
+    background:linear-gradient(135deg,#7c3aed,#a855f7);
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:10px 18px;
+    cursor:pointer;
+    font-weight:bold;
+    box-shadow:0 4px 12px rgba(124,58,237,0.35);
+    transition:transform 0.1s,box-shadow 0.1s;
+    letter-spacing:0.5px;
   }
-  .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(124,58,237,0.45); }
-  .submit-btn:active { transform: translateY(0); }
-
-  .feedback {
-    font-size: 1.05rem;
-    font-weight: bold;
-    min-height: 28px;
-    text-align: center;
-    transition: opacity 0.3s;
-  }
-  .feedback.good { color: #16a34a; }
-  .feedback.bad  { color: #dc2626; }
-
+  .submit-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(124,58,237,0.45);}
+  .submit-btn:active{transform:translateY(0);}
+  .feedback{font-size:1rem;font-weight:bold;min-height:26px;text-align:center;}
+  .feedback.good{color:#16a34a;}
+  .feedback.bad{color:#dc2626;}
   .hint-btn {
-    font-family: inherit;
-    font-size: 0.82rem;
-    background: none;
-    border: 2px dashed #c4b5fd;
-    color: #7c3aed;
-    border-radius: 8px;
-    padding: 4px 14px;
-    cursor: pointer;
-    opacity: 0.8;
+    font-family:inherit;font-size:0.8rem;
+    background:none;border:2px dashed #c4b5fd;color:#7c3aed;
+    border-radius:8px;padding:4px 14px;cursor:pointer;opacity:0.8;
   }
-  .hint-btn:hover { opacity: 1; background: #faf5ff; }
-
-  .hint-text {
-    font-size: 0.85rem;
-    color: #6b7280;
-    min-height: 20px;
-    text-align: center;
-    font-style: italic;
-  }
-
-  /* Progress bar */
-  .progress-wrap {
-    width: 100%;
-  }
-  .progress-label {
-    font-size: 0.8rem;
-    color: #6b7280;
-    margin-bottom: 4px;
-    text-align: center;
-  }
-  .progress-track {
-    width: 100%;
-    height: 14px;
-    background: #e9d5ff;
-    border-radius: 7px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #a855f7, #ec4899);
-    border-radius: 7px;
-    transition: width 0.5s ease;
-  }
+  .hint-btn:hover{opacity:1;background:#faf5ff;}
+  .hint-text{font-size:0.82rem;color:#6b7280;min-height:18px;text-align:center;font-style:italic;}
+  .progress-wrap{width:100%;}
+  .progress-label{font-size:0.78rem;color:#6b7280;margin-bottom:4px;text-align:center;}
+  .progress-track{width:100%;height:13px;background:#e9d5ff;border-radius:7px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#a855f7,#ec4899);border-radius:7px;transition:width 0.5s ease;}
 
   /* ── CELEBRATION ── */
-  #celebration {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 100;
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
+  #celebration{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,0.55);z-index:100;
+    justify-content:center;align-items:center;padding:16px;
   }
-  #celebration.show { display: flex; }
+  #celebration.show{display:flex;}
+  .celeb-box{
+    background:white;border-radius:24px;padding:36px 30px;
+    text-align:center;max-width:420px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    border:4px solid #f9a8d4;
+    animation:bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes bounceIn{from{transform:scale(0.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .celeb-box h2{font-size:2rem;color:#7c3aed;margin-bottom:10px;}
+  .celeb-box p{font-size:1rem;color:#374151;margin-bottom:6px;line-height:1.5;}
+  .celeb-dog{font-size:4.5rem;margin-bottom:6px;}
+  .celeb-scores{
+    display:flex;gap:16px;justify-content:center;
+    margin:12px 0 16px;
+  }
+  .celeb-score-box{
+    background:linear-gradient(135deg,#ede9fe,#fce7f3);
+    border-radius:12px;padding:10px 16px;text-align:center;
+  }
+  .celeb-score-box .val{font-size:1.5rem;font-weight:bold;color:#7c3aed;}
+  .celeb-score-box .lbl{font-size:0.75rem;color:#6b7280;}
+  .next-teaser{
+    font-size:0.9rem;color:#6b7280;
+    background:#f9fafb;border-radius:10px;
+    padding:8px 14px;margin-bottom:14px;
+    border:2px dashed #e5e7eb;
+  }
+  .next-teaser strong{color:#374151;}
+  .next-btn{
+    font-family:inherit;font-size:1.1rem;
+    background:linear-gradient(135deg,#f59e0b,#ef4444);
+    color:white;border:none;border-radius:14px;
+    padding:13px 30px;cursor:pointer;font-weight:bold;
+    box-shadow:0 6px 18px rgba(239,68,68,0.35);
+    letter-spacing:0.5px;transition:transform 0.1s;
+  }
+  .next-btn:hover{transform:translateY(-2px);}
 
-  .celeb-box {
-    background: white;
-    border-radius: 24px;
-    padding: 40px 36px;
-    text-align: center;
-    max-width: 420px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    border: 4px solid #f9a8d4;
-    animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes bounceIn {
-    from { transform: scale(0.4); opacity: 0; }
-    to   { transform: scale(1);   opacity: 1; }
-  }
-  .celeb-box h2 { font-size: 2.2rem; color: #7c3aed; margin-bottom: 12px; }
-  .celeb-box p  { font-size: 1.1rem; color: #374151; margin-bottom: 20px; line-height: 1.5; }
-  .celeb-dog    { font-size: 5rem; margin-bottom: 8px; }
-  .play-again-btn {
-    font-family: inherit;
-    font-size: 1.2rem;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    padding: 14px 36px;
-    cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 6px 18px rgba(239,68,68,0.35);
-    letter-spacing: 0.5px;
-    transition: transform 0.1s;
-  }
-  .play-again-btn:hover { transform: translateY(-2px); }
+  .confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:99;}
 
-  .confetti-canvas {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 99;
+  @media(max-width:600px){
+    .puzzle-container{width:340px;height:272px;}
   }
-
-  @media (max-width: 600px) {
-    .puzzle-container { width: 340px; height: 272px; }
-  }
-  @media (max-width: 380px) {
-    .puzzle-container { width: 290px; height: 232px; }
+  @media(max-width:380px){
+    .puzzle-container{width:290px;height:232px;}
   }
 </style>
 </head>
 <body>
 
-<h1>🐾 Frenchie Math Puzzle 🐾</h1>
+<h1>🐾 Puppy Math Puzzles 🐾</h1>
+
+<div class="dog-banner" id="dogBanner">Reveal: Frenchie the French Bulldog!</div>
 
 <div class="score-bar">
-  <div>Pieces found: <span class="pieces-count" id="piecesCount">0 / 50</span></div>
-  <div>⭐ Score: <span id="scoreVal">0</span></div>
+  <div>🧩 Puzzle <span class="puzzle-num" id="puzzleNumDisplay">1</span></div>
+  <div>Pieces: <span class="pieces-count" id="piecesCount">0 / 50</span></div>
+  <div>⭐ <span id="scoreVal">0</span></div>
   <div>🔥 Streak: <span class="streak" id="streakVal">0</span></div>
 </div>
 
 <div class="main-wrap">
-
   <!-- PUZZLE -->
   <div class="puzzle-section">
-    <div class="puzzle-label">🧩 Complete the Frenchie! 🧩</div>
+    <div class="puzzle-label">🧩 Who's hiding? Solve to find out! 🧩</div>
     <div class="puzzle-container" id="puzzleContainer">
-      <!-- French Bulldog SVG -->
-      <svg class="dog-svg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
-        <!-- Sky/background -->
-        <rect width="500" height="400" fill="#d4eaff"/>
-        <!-- Grass -->
-        <ellipse cx="250" cy="400" rx="300" ry="80" fill="#86efac"/>
-        <rect x="0" y="360" width="500" height="40" fill="#86efac"/>
-
-        <!-- Body (brindle pattern base) -->
-        <ellipse cx="250" cy="290" rx="115" ry="90" fill="#a3785a"/>
-        <!-- Brindle stripes on body -->
-        <ellipse cx="235" cy="260" rx="18" ry="55" fill="#7a5a3f" opacity="0.35"/>
-        <ellipse cx="265" cy="275" rx="14" ry="48" fill="#5c3d20" opacity="0.25"/>
-        <ellipse cx="295" cy="268" rx="10" ry="42" fill="#7a5a3f" opacity="0.25"/>
-        <ellipse cx="210" cy="272" rx="10" ry="40" fill="#5c3d20" opacity="0.22"/>
-
-        <!-- White chest patch -->
-        <ellipse cx="250" cy="310" rx="55" ry="55" fill="#f5f0eb"/>
-        <ellipse cx="250" cy="330" rx="45" ry="38" fill="#ede8e3"/>
-
-        <!-- Tail -->
-        <path d="M355 310 Q390 280 380 250 Q370 225 360 240 Q365 260 355 285 Z" fill="#a3785a"/>
-
-        <!-- Front legs -->
-        <rect x="195" y="345" width="30" height="50" rx="12" fill="#a3785a"/>
-        <rect x="275" y="345" width="30" height="50" rx="12" fill="#a3785a"/>
-        <!-- Paws -->
-        <ellipse cx="210" cy="398" rx="20" ry="10" fill="#8b6545"/>
-        <ellipse cx="290" cy="398" rx="20" ry="10" fill="#8b6545"/>
-        <!-- Paw toes front -->
-        <ellipse cx="200" cy="398" rx="7" ry="6" fill="#7a5535"/>
-        <ellipse cx="210" cy="400" rx="7" ry="6" fill="#7a5535"/>
-        <ellipse cx="220" cy="398" rx="7" ry="6" fill="#7a5535"/>
-        <ellipse cx="280" cy="398" rx="7" ry="6" fill="#7a5535"/>
-        <ellipse cx="290" cy="400" rx="7" ry="6" fill="#7a5535"/>
-        <ellipse cx="300" cy="398" rx="7" ry="6" fill="#7a5535"/>
-
-        <!-- Back legs -->
-        <ellipse cx="175" cy="355" rx="28" ry="20" fill="#9a7050"/>
-        <ellipse cx="325" cy="355" rx="28" ry="20" fill="#9a7050"/>
-
-        <!-- Neck -->
-        <ellipse cx="250" cy="225" rx="55" ry="40" fill="#a3785a"/>
-
-        <!-- HEAD - big round French Bulldog head -->
-        <circle cx="250" cy="175" r="90" fill="#b8896a"/>
-
-        <!-- Brindle on head -->
-        <ellipse cx="230" cy="148" rx="16" ry="38" fill="#7a5a3f" opacity="0.3"/>
-        <ellipse cx="268" cy="155" rx="13" ry="32" fill="#5c3d20" opacity="0.22"/>
-        <ellipse cx="295" cy="165" rx="9" ry="25" fill="#7a5a3f" opacity="0.2"/>
-
-        <!-- White face mask -->
-        <ellipse cx="250" cy="200" rx="58" ry="52" fill="#f0ebe5"/>
-        <ellipse cx="250" cy="210" rx="52" ry="44" fill="#ede5dc"/>
-
-        <!-- EARS - big French Bulldog bat ears -->
-        <!-- Left ear -->
-        <path d="M168 120 Q130 60 158 30 Q182 15 200 55 Q215 85 205 115 Z" fill="#a3785a"/>
-        <path d="M175 115 Q148 72 163 48 Q180 30 195 60 Q207 83 200 110 Z" fill="#d4846a"/>
-        <!-- Right ear -->
-        <path d="M332 120 Q370 60 342 30 Q318 15 300 55 Q285 85 295 115 Z" fill="#a3785a"/>
-        <path d="M325 115 Q352 72 337 48 Q320 30 305 60 Q293 83 300 110 Z" fill="#d4846a"/>
-
-        <!-- Ear inner details -->
-        <path d="M178 112 Q155 78 165 55 Q178 38 192 63 Q202 82 198 108 Z" fill="#c97060" opacity="0.5"/>
-        <path d="M322 112 Q345 78 335 55 Q322 38 308 63 Q298 82 302 108 Z" fill="#c97060" opacity="0.5"/>
-
-        <!-- EYES -->
-        <!-- Eye whites -->
-        <ellipse cx="215" cy="165" rx="22" ry="20" fill="white"/>
-        <ellipse cx="285" cy="165" rx="22" ry="20" fill="white"/>
-        <!-- Irises - big dark brown eyes -->
-        <circle cx="216" cy="166" r="15" fill="#3d1c08"/>
-        <circle cx="284" cy="166" r="15" fill="#3d1c08"/>
-        <!-- Pupils -->
-        <circle cx="217" cy="167" r="9" fill="#1a0a02"/>
-        <circle cx="283" cy="167" r="9" fill="#1a0a02"/>
-        <!-- Eye shine -->
-        <circle cx="221" cy="161" r="4" fill="white" opacity="0.9"/>
-        <circle cx="287" cy="161" r="4" fill="white" opacity="0.9"/>
-        <circle cx="225" cy="167" r="2" fill="white" opacity="0.6"/>
-        <circle cx="291" cy="167" r="2" fill="white" opacity="0.6"/>
-        <!-- Eyelashes top -->
-        <path d="M197 152 Q205 145 215 148" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M205 148 Q210 140 218 144" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M273 148 Q278 140 282 144" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M281 148 Q288 142 296 148" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-
-        <!-- Eyebrows (expressive) -->
-        <path d="M196 148 Q215 136 234 142" stroke="#5c3d20" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <path d="M266 142 Q285 136 304 148" stroke="#5c3d20" stroke-width="4" fill="none" stroke-linecap="round"/>
-
-        <!-- Wrinkle lines on forehead -->
-        <path d="M235 140 Q250 132 265 140" stroke="#8b6040" stroke-width="2" fill="none" opacity="0.6"/>
-        <path d="M228 148 Q250 140 272 148" stroke="#8b6040" stroke-width="1.5" fill="none" opacity="0.4"/>
-
-        <!-- NOSE - big flat French Bulldog snout/muzzle -->
-        <ellipse cx="250" cy="205" rx="42" ry="32" fill="#d4b49a"/>
-        <!-- Muzzle detail wrinkle -->
-        <path d="M215 196 Q250 188 285 196" stroke="#b89070" stroke-width="2" fill="none" opacity="0.6"/>
-
-        <!-- Nose tip -->
-        <ellipse cx="250" cy="197" rx="26" ry="18" fill="#2d1810"/>
-        <!-- Nose highlights -->
-        <ellipse cx="241" cy="192" rx="7" ry="5" fill="#4a2820" opacity="0.6"/>
-        <ellipse cx="258" cy="191" rx="7" ry="5" fill="#4a2820" opacity="0.6"/>
-        <ellipse cx="244" cy="190" rx="4" ry="3" fill="#8a5040" opacity="0.7"/>
-        <!-- Nose shine -->
-        <ellipse cx="258" cy="193" rx="5" ry="4" fill="white" opacity="0.3"/>
-
-        <!-- Nostrils -->
-        <ellipse cx="237" cy="199" rx="8" ry="7" fill="#1a0c06"/>
-        <ellipse cx="263" cy="199" rx="8" ry="7" fill="#1a0c06"/>
-
-        <!-- MOUTH -->
-        <path d="M232 218 Q250 230 268 218" stroke="#8b4a35" stroke-width="3" fill="none" stroke-linecap="round"/>
-        <!-- Smile lines from corners -->
-        <path d="M232 218 Q226 224 228 230" stroke="#8b4a35" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <path d="M268 218 Q274 224 272 230" stroke="#8b4a35" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-
-        <!-- Tongue peeking out -->
-        <ellipse cx="250" cy="232" rx="16" ry="12" fill="#f87171"/>
-        <ellipse cx="250" cy="235" rx="16" ry="10" fill="#f87171"/>
-        <path d="M234 230 Q250 242 266 230" fill="#ef4444"/>
-        <!-- Tongue center line -->
-        <path d="M250 228 Q250 241 250 241" stroke="#dc2626" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-        <!-- Tongue shine -->
-        <ellipse cx="244" cy="231" rx="5" ry="4" fill="#fca5a5" opacity="0.7"/>
-
-        <!-- Cheek blush -->
-        <ellipse cx="192" cy="192" rx="22" ry="14" fill="#f9a8d4" opacity="0.45"/>
-        <ellipse cx="308" cy="192" rx="22" ry="14" fill="#f9a8d4" opacity="0.45"/>
-
-        <!-- Chin wrinkle -->
-        <path d="M225 240 Q250 248 275 240" stroke="#c4936a" stroke-width="2" fill="none" opacity="0.5"/>
-
-        <!-- Collar -->
-        <rect x="200" y="248" width="100" height="20" rx="8" fill="#ec4899"/>
-        <rect x="205" y="250" width="90" height="16" rx="6" fill="#f472b6"/>
-        <!-- Collar tag -->
-        <circle cx="250" cy="270" r="10" fill="#fbbf24"/>
-        <circle cx="250" cy="270" r="7" fill="#f59e0b"/>
-        <text x="250" y="274" text-anchor="middle" font-size="8" fill="white" font-weight="bold">♥</text>
-        <!-- Collar studs -->
-        <circle cx="220" cy="258" r="4" fill="#fbbf24"/>
-        <circle cx="235" cy="258" r="4" fill="#fbbf24"/>
-        <circle cx="265" cy="258" r="4" fill="#fbbf24"/>
-        <circle cx="280" cy="258" r="4" fill="#fbbf24"/>
-
-        <!-- Flower / bow on collar -->
-        <circle cx="185" cy="258" r="8" fill="#a855f7"/>
-        <circle cx="178" cy="252" r="6" fill="#c084fc"/>
-        <circle cx="192" cy="252" r="6" fill="#c084fc"/>
-        <circle cx="178" cy="264" r="6" fill="#c084fc"/>
-        <circle cx="192" cy="264" r="6" fill="#c084fc"/>
-        <circle cx="185" cy="258" r="5" fill="#fde68a"/>
-
-        <!-- Some floating hearts / stars around the dog -->
-        <text x="70" y="100" font-size="24" opacity="0.6">💕</text>
-        <text x="390" y="90" font-size="22" opacity="0.6">⭐</text>
-        <text x="55" y="280" font-size="18" opacity="0.55">🌸</text>
-        <text x="410" y="285" font-size="18" opacity="0.55">🌸</text>
-        <text x="90" y="180" font-size="16" opacity="0.5">✨</text>
-        <text x="395" y="185" font-size="16" opacity="0.5">✨</text>
-
-        <!-- Grass details -->
-        <path d="M30 360 Q40 340 50 360" stroke="#4ade80" stroke-width="3" fill="none"/>
-        <path d="M60 365 Q68 348 76 365" stroke="#4ade80" stroke-width="3" fill="none"/>
-        <path d="M420 362 Q430 344 440 362" stroke="#4ade80" stroke-width="3" fill="none"/>
-        <path d="M450 358 Q458 342 466 358" stroke="#4ade80" stroke-width="3" fill="none"/>
-        <path d="M140 370 Q148 355 156 370" stroke="#4ade80" stroke-width="2.5" fill="none"/>
-        <path d="M350 368 Q358 353 366 368" stroke="#4ade80" stroke-width="2.5" fill="none"/>
-      </svg>
-
-      <!-- Puzzle piece overlay -->
+      <svg class="dog-svg" id="dogSvg" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg"></svg>
       <div class="puzzle-overlay" id="puzzleOverlay"></div>
     </div>
   </div>
@@ -531,27 +290,14 @@
   <!-- MATH PANEL -->
   <div class="math-panel">
     <div class="math-title">🧮 Solve to Reveal a Piece!</div>
-
     <div class="question-badge" id="questionBadge">?</div>
-
     <div class="answer-row">
-      <input
-        class="answer-input"
-        type="number"
-        id="answerInput"
-        placeholder="?"
-        min="0"
-        max="200"
-        autocomplete="off"
-      />
+      <input class="answer-input" type="number" id="answerInput" placeholder="?" min="0" max="200" autocomplete="off"/>
       <button class="submit-btn" id="submitBtn" onclick="checkAnswer()">✓ GO!</button>
     </div>
-
     <div class="feedback" id="feedback"></div>
-
     <button class="hint-btn" onclick="showHint()">💡 Hint</button>
     <div class="hint-text" id="hintText"></div>
-
     <div class="progress-wrap">
       <div class="progress-label" id="progressLabel">0 of 50 pieces found</div>
       <div class="progress-track">
@@ -559,60 +305,540 @@
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Celebration overlay -->
 <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
 <div id="celebration">
   <div class="celeb-box">
-    <div class="celeb-dog">🐶</div>
-    <h2>🎉 You Did It! 🎉</h2>
-    <p>Wow, you revealed the whole Frenchie!<br>
-      You solved <strong>50 math problems</strong>!<br>
-      Score: <strong id="finalScore">0</strong> ⭐</p>
-    <button class="play-again-btn" onclick="resetGame()">🔄 Play Again!</button>
+    <div class="celeb-dog" id="celebEmoji">🐶</div>
+    <h2>🎉 Puzzle Complete! 🎉</h2>
+    <p id="celebMsg">You revealed the puppy!</p>
+    <div class="celeb-scores">
+      <div class="celeb-score-box">
+        <div class="val" id="celebPuzzleScore">0</div>
+        <div class="lbl">This Puzzle</div>
+      </div>
+      <div class="celeb-score-box">
+        <div class="val" id="celebTotalScore">0</div>
+        <div class="lbl">Total ⭐</div>
+      </div>
+    </div>
+    <div class="next-teaser" id="nextTeaser">Next up: ...</div>
+    <button class="next-btn" id="nextBtn" onclick="nextPuppy()">🐶 Next Puppy! →</button>
   </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
+//  DOGS — 5 unique puppies
+// ═══════════════════════════════════════════
+const DOGS = [
+
+  // ── 1. FRENCH BULLDOG ──────────────────────────────────────────
+  {
+    name: "Frenchie",
+    breed: "French Bulldog",
+    emoji: "🐾",
+    border: "#7c3aed",
+    bgGradient: ["#ffe0f0","#e0f0ff","#f0ffe0"],
+    svgContent: `
+      <rect width="500" height="400" fill="#d4eaff"/>
+      <ellipse cx="250" cy="400" rx="300" ry="80" fill="#86efac"/>
+      <rect x="0" y="360" width="500" height="40" fill="#86efac"/>
+      <ellipse cx="250" cy="290" rx="115" ry="90" fill="#a3785a"/>
+      <ellipse cx="235" cy="260" rx="18" ry="55" fill="#7a5a3f" opacity=".35"/>
+      <ellipse cx="265" cy="275" rx="14" ry="48" fill="#5c3d20" opacity=".25"/>
+      <ellipse cx="295" cy="268" rx="10" ry="42" fill="#7a5a3f" opacity=".25"/>
+      <ellipse cx="210" cy="272" rx="10" ry="40" fill="#5c3d20" opacity=".22"/>
+      <ellipse cx="250" cy="310" rx="55" ry="55" fill="#f5f0eb"/>
+      <ellipse cx="250" cy="330" rx="45" ry="38" fill="#ede8e3"/>
+      <path d="M355 310 Q390 280 380 250 Q370 225 360 240 Q365 260 355 285 Z" fill="#a3785a"/>
+      <rect x="195" y="345" width="30" height="50" rx="12" fill="#a3785a"/>
+      <rect x="275" y="345" width="30" height="50" rx="12" fill="#a3785a"/>
+      <ellipse cx="210" cy="398" rx="20" ry="10" fill="#8b6545"/>
+      <ellipse cx="290" cy="398" rx="20" ry="10" fill="#8b6545"/>
+      <ellipse cx="200" cy="398" rx="7" ry="6" fill="#7a5535"/>
+      <ellipse cx="210" cy="400" rx="7" ry="6" fill="#7a5535"/>
+      <ellipse cx="220" cy="398" rx="7" ry="6" fill="#7a5535"/>
+      <ellipse cx="280" cy="398" rx="7" ry="6" fill="#7a5535"/>
+      <ellipse cx="290" cy="400" rx="7" ry="6" fill="#7a5535"/>
+      <ellipse cx="300" cy="398" rx="7" ry="6" fill="#7a5535"/>
+      <ellipse cx="175" cy="355" rx="28" ry="20" fill="#9a7050"/>
+      <ellipse cx="325" cy="355" rx="28" ry="20" fill="#9a7050"/>
+      <ellipse cx="250" cy="225" rx="55" ry="40" fill="#a3785a"/>
+      <circle cx="250" cy="175" r="90" fill="#b8896a"/>
+      <ellipse cx="230" cy="148" rx="16" ry="38" fill="#7a5a3f" opacity=".3"/>
+      <ellipse cx="268" cy="155" rx="13" ry="32" fill="#5c3d20" opacity=".22"/>
+      <ellipse cx="250" cy="200" rx="58" ry="52" fill="#f0ebe5"/>
+      <ellipse cx="250" cy="210" rx="52" ry="44" fill="#ede5dc"/>
+      <path d="M168 120 Q130 60 158 30 Q182 15 200 55 Q215 85 205 115 Z" fill="#a3785a"/>
+      <path d="M175 115 Q148 72 163 48 Q180 30 195 60 Q207 83 200 110 Z" fill="#d4846a"/>
+      <path d="M332 120 Q370 60 342 30 Q318 15 300 55 Q285 85 295 115 Z" fill="#a3785a"/>
+      <path d="M325 115 Q352 72 337 48 Q320 30 305 60 Q293 83 300 110 Z" fill="#d4846a"/>
+      <path d="M178 112 Q155 78 165 55 Q178 38 192 63 Q202 82 198 108 Z" fill="#c97060" opacity=".5"/>
+      <path d="M322 112 Q345 78 335 55 Q322 38 308 63 Q298 82 302 108 Z" fill="#c97060" opacity=".5"/>
+      <ellipse cx="215" cy="165" rx="22" ry="20" fill="white"/>
+      <ellipse cx="285" cy="165" rx="22" ry="20" fill="white"/>
+      <circle cx="216" cy="166" r="15" fill="#3d1c08"/>
+      <circle cx="284" cy="166" r="15" fill="#3d1c08"/>
+      <circle cx="217" cy="167" r="9" fill="#1a0a02"/>
+      <circle cx="283" cy="167" r="9" fill="#1a0a02"/>
+      <circle cx="221" cy="161" r="4" fill="white" opacity=".9"/>
+      <circle cx="287" cy="161" r="4" fill="white" opacity=".9"/>
+      <circle cx="225" cy="167" r="2" fill="white" opacity=".6"/>
+      <circle cx="291" cy="167" r="2" fill="white" opacity=".6"/>
+      <path d="M197 152 Q205 145 215 148" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M205 148 Q210 140 218 144" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M273 148 Q278 140 282 144" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M281 148 Q288 142 296 148" stroke="#3d1c08" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M196 148 Q215 136 234 142" stroke="#5c3d20" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M266 142 Q285 136 304 148" stroke="#5c3d20" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M235 140 Q250 132 265 140" stroke="#8b6040" stroke-width="2" fill="none" opacity=".6"/>
+      <ellipse cx="250" cy="205" rx="42" ry="32" fill="#d4b49a"/>
+      <path d="M215 196 Q250 188 285 196" stroke="#b89070" stroke-width="2" fill="none" opacity=".6"/>
+      <ellipse cx="250" cy="197" rx="26" ry="18" fill="#2d1810"/>
+      <ellipse cx="241" cy="192" rx="7" ry="5" fill="#4a2820" opacity=".6"/>
+      <ellipse cx="258" cy="191" rx="7" ry="5" fill="#4a2820" opacity=".6"/>
+      <ellipse cx="258" cy="193" rx="5" ry="4" fill="white" opacity=".3"/>
+      <ellipse cx="237" cy="199" rx="8" ry="7" fill="#1a0c06"/>
+      <ellipse cx="263" cy="199" rx="8" ry="7" fill="#1a0c06"/>
+      <path d="M232 218 Q250 230 268 218" stroke="#8b4a35" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M232 218 Q226 224 228 230" stroke="#8b4a35" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M268 218 Q274 224 272 230" stroke="#8b4a35" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="232" rx="16" ry="12" fill="#f87171"/>
+      <ellipse cx="250" cy="235" rx="16" ry="10" fill="#f87171"/>
+      <path d="M234 230 Q250 242 266 230" fill="#ef4444"/>
+      <path d="M250 228 Q250 241 250 241" stroke="#dc2626" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="244" cy="231" rx="5" ry="4" fill="#fca5a5" opacity=".7"/>
+      <ellipse cx="192" cy="192" rx="22" ry="14" fill="#f9a8d4" opacity=".45"/>
+      <ellipse cx="308" cy="192" rx="22" ry="14" fill="#f9a8d4" opacity=".45"/>
+      <path d="M225 240 Q250 248 275 240" stroke="#c4936a" stroke-width="2" fill="none" opacity=".5"/>
+      <rect x="200" y="248" width="100" height="20" rx="8" fill="#ec4899"/>
+      <rect x="205" y="250" width="90" height="16" rx="6" fill="#f472b6"/>
+      <circle cx="250" cy="270" r="10" fill="#fbbf24"/>
+      <circle cx="250" cy="270" r="7" fill="#f59e0b"/>
+      <text x="250" y="274" text-anchor="middle" font-size="8" fill="white" font-weight="bold">♥</text>
+      <circle cx="220" cy="258" r="4" fill="#fbbf24"/>
+      <circle cx="235" cy="258" r="4" fill="#fbbf24"/>
+      <circle cx="265" cy="258" r="4" fill="#fbbf24"/>
+      <circle cx="280" cy="258" r="4" fill="#fbbf24"/>
+      <circle cx="185" cy="258" r="8" fill="#a855f7"/>
+      <circle cx="178" cy="252" r="6" fill="#c084fc"/>
+      <circle cx="192" cy="252" r="6" fill="#c084fc"/>
+      <circle cx="178" cy="264" r="6" fill="#c084fc"/>
+      <circle cx="192" cy="264" r="6" fill="#c084fc"/>
+      <circle cx="185" cy="258" r="5" fill="#fde68a"/>
+      <text x="70" y="100" font-size="24" opacity=".6">💕</text>
+      <text x="390" y="90" font-size="22" opacity=".6">⭐</text>
+      <text x="55" y="280" font-size="18" opacity=".55">🌸</text>
+      <text x="410" y="285" font-size="18" opacity=".55">🌸</text>
+      <text x="90" y="180" font-size="16" opacity=".5">✨</text>
+      <text x="395" y="185" font-size="16" opacity=".5">✨</text>
+      <path d="M30 360 Q40 340 50 360" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M60 365 Q68 348 76 365" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M420 362 Q430 344 440 362" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M450 358 Q458 342 466 358" stroke="#4ade80" stroke-width="3" fill="none"/>
+    `
+  },
+
+  // ── 2. GOLDEN RETRIEVER ────────────────────────────────────────
+  {
+    name: "Goldie",
+    breed: "Golden Retriever",
+    emoji: "🐕",
+    border: "#d97706",
+    bgGradient: ["#fef9c3","#fde68a","#d1fae5"],
+    svgContent: `
+      <rect width="500" height="400" fill="#bfdbfe"/>
+      <circle cx="420" cy="58" r="42" fill="#fde68a"/>
+      <line x1="420" y1="8" x2="420" y2="28" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="370" y1="58" x2="390" y2="58" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="450" y1="58" x2="470" y2="58" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="387" y1="25" x2="402" y2="40" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="438" y1="76" x2="453" y2="91" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="453" y1="25" x2="438" y2="40" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <line x1="402" y1="76" x2="387" y2="91" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/>
+      <ellipse cx="90" cy="80" rx="55" ry="28" fill="white" opacity=".7"/>
+      <ellipse cx="115" cy="68" rx="42" ry="24" fill="white" opacity=".7"/>
+      <ellipse cx="68" cy="73" rx="35" ry="20" fill="white" opacity=".7"/>
+      <rect x="0" y="358" width="500" height="42" fill="#4ade80"/>
+      <ellipse cx="250" cy="358" rx="310" ry="55" fill="#4ade80"/>
+      <ellipse cx="250" cy="295" rx="108" ry="80" fill="#d97706"/>
+      <ellipse cx="250" cy="318" rx="65" ry="54" fill="#fde68a"/>
+      <path d="M352 272 Q395 240 398 205 Q400 180 386 175 Q374 176 372 200 Q370 226 358 255 Z" fill="#b45309"/>
+      <ellipse cx="175" cy="355" rx="30" ry="18" fill="#b45309"/>
+      <ellipse cx="325" cy="355" rx="30" ry="18" fill="#b45309"/>
+      <rect x="193" y="350" width="30" height="42" rx="13" fill="#d97706"/>
+      <rect x="277" y="350" width="30" height="42" rx="13" fill="#d97706"/>
+      <ellipse cx="208" cy="394" rx="20" ry="9" fill="#b45309"/>
+      <ellipse cx="292" cy="394" rx="20" ry="9" fill="#b45309"/>
+      <ellipse cx="199" cy="395" rx="7" ry="5" fill="#92400e"/>
+      <ellipse cx="208" cy="398" rx="7" ry="5" fill="#92400e"/>
+      <ellipse cx="217" cy="395" rx="7" ry="5" fill="#92400e"/>
+      <ellipse cx="283" cy="395" rx="7" ry="5" fill="#92400e"/>
+      <ellipse cx="292" cy="398" rx="7" ry="5" fill="#92400e"/>
+      <ellipse cx="301" cy="395" rx="7" ry="5" fill="#92400e"/>
+      <ellipse cx="250" cy="232" rx="52" ry="38" fill="#d97706"/>
+      <circle cx="250" cy="180" r="84" fill="#d97706"/>
+      <ellipse cx="250" cy="190" rx="60" ry="58" fill="#fbbf24" opacity=".3"/>
+      <path d="M171 148 Q138 158 132 215 Q128 258 148 268 Q166 275 174 238 Q182 200 180 158 Z" fill="#b45309"/>
+      <path d="M178 156 Q152 166 148 215 Q145 250 160 260 Q172 265 178 232 Q184 200 182 162 Z" fill="#ca8a04" opacity=".5"/>
+      <path d="M329 148 Q362 158 368 215 Q372 258 352 268 Q334 275 326 238 Q318 200 320 158 Z" fill="#b45309"/>
+      <path d="M322 156 Q348 166 352 215 Q355 250 340 260 Q328 265 322 232 Q316 200 318 162 Z" fill="#ca8a04" opacity=".5"/>
+      <circle cx="220" cy="170" r="21" fill="white"/>
+      <circle cx="280" cy="170" r="21" fill="white"/>
+      <circle cx="221" cy="171" r="15" fill="#5c2a0a"/>
+      <circle cx="279" cy="171" r="15" fill="#5c2a0a"/>
+      <circle cx="222" cy="172" r="9" fill="#1a0a02"/>
+      <circle cx="278" cy="172" r="9" fill="#1a0a02"/>
+      <circle cx="226" cy="164" r="5" fill="white" opacity=".9"/>
+      <circle cx="284" cy="164" r="5" fill="white" opacity=".9"/>
+      <circle cx="230" cy="171" r="2.5" fill="white" opacity=".6"/>
+      <circle cx="288" cy="171" r="2.5" fill="white" opacity=".6"/>
+      <path d="M202 152 Q220 142 238 150" stroke="#92400e" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M262 150 Q280 142 298 152" stroke="#92400e" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="206" rx="40" ry="27" fill="#fbbf24" opacity=".55"/>
+      <ellipse cx="250" cy="200" rx="22" ry="15" fill="#1a0a02"/>
+      <ellipse cx="258" cy="196" rx="6" ry="4" fill="white" opacity=".3"/>
+      <path d="M233 216 Q250 230 267 216" stroke="#92400e" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="230" rx="15" ry="11" fill="#f87171"/>
+      <path d="M250 223 L250 236" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <ellipse cx="245" cy="227" rx="5" ry="4" fill="#fca5a5" opacity=".6"/>
+      <ellipse cx="194" cy="196" rx="22" ry="14" fill="#f9a8d4" opacity=".4"/>
+      <ellipse cx="306" cy="196" rx="22" ry="14" fill="#f9a8d4" opacity=".4"/>
+      <ellipse cx="250" cy="98" rx="42" ry="18" fill="#b45309" opacity=".6"/>
+      <ellipse cx="232" cy="102" rx="18" ry="12" fill="#fbbf24" opacity=".5"/>
+      <ellipse cx="268" cy="102" rx="18" ry="12" fill="#fbbf24" opacity=".5"/>
+      <rect x="206" y="250" width="88" height="18" rx="8" fill="#dc2626"/>
+      <rect x="210" y="252" width="80" height="14" rx="6" fill="#ef4444"/>
+      <rect x="244" y="267" width="12" height="4" rx="2" fill="#fbbf24"/>
+      <circle cx="244" cy="269" r="4" fill="#fbbf24"/>
+      <circle cx="256" cy="269" r="4" fill="#fbbf24"/>
+      <ellipse cx="250" cy="269" rx="5" ry="4" fill="#fde68a"/>
+      <text x="60" y="330" font-size="22" opacity=".65">🌻</text>
+      <text x="408" y="325" font-size="22" opacity=".65">🌼</text>
+      <text x="78" y="105" font-size="18" opacity=".5">💛</text>
+      <text x="380" y="150" font-size="16" opacity=".5">✨</text>
+      <path d="M30 362 Q40 344 50 362" stroke="#22c55e" stroke-width="3" fill="none"/>
+      <path d="M62 366 Q70 350 78 366" stroke="#22c55e" stroke-width="3" fill="none"/>
+      <path d="M418 360 Q428 342 438 360" stroke="#22c55e" stroke-width="3" fill="none"/>
+    `
+  },
+
+  // ── 3. DALMATIAN ──────────────────────────────────────────────
+  {
+    name: "Dottie",
+    breed: "Dalmatian",
+    emoji: "🐩",
+    border: "#1e293b",
+    bgGradient: ["#fef9c3","#fef3c7","#d1fae5"],
+    svgContent: `
+      <rect width="500" height="400" fill="#fef9c3"/>
+      <ellipse cx="100" cy="72" rx="58" ry="30" fill="white" opacity=".85"/>
+      <ellipse cx="130" cy="60" rx="44" ry="27" fill="white" opacity=".85"/>
+      <ellipse cx="78" cy="66" rx="36" ry="22" fill="white" opacity=".85"/>
+      <ellipse cx="385" cy="80" rx="52" ry="27" fill="white" opacity=".85"/>
+      <ellipse cx="412" cy="68" rx="40" ry="24" fill="white" opacity=".85"/>
+      <circle cx="60" cy="55" r="18" fill="#fde68a" opacity=".9"/>
+      <circle cx="440" cy="40" r="14" fill="#fde68a" opacity=".9"/>
+      <rect x="0" y="360" width="500" height="40" fill="#86efac"/>
+      <ellipse cx="250" cy="360" rx="310" ry="55" fill="#86efac"/>
+      <ellipse cx="250" cy="295" rx="110" ry="82" fill="#f8fafc"/>
+      <ellipse cx="205" cy="268" rx="18" ry="14" fill="#1e293b"/>
+      <ellipse cx="255" cy="248" rx="13" ry="10" fill="#1e293b"/>
+      <ellipse cx="298" cy="272" rx="19" ry="15" fill="#1e293b"/>
+      <ellipse cx="232" cy="312" rx="12" ry="9" fill="#1e293b"/>
+      <ellipse cx="278" cy="320" rx="15" ry="11" fill="#1e293b"/>
+      <ellipse cx="318" cy="296" rx="10" ry="13" fill="#1e293b"/>
+      <ellipse cx="192" cy="308" rx="12" ry="9" fill="#1e293b"/>
+      <circle cx="268" cy="296" r="8" fill="#1e293b"/>
+      <circle cx="308" cy="255" r="8" fill="#1e293b"/>
+      <circle cx="218" cy="290" r="6" fill="#1e293b"/>
+      <path d="M358 278 Q395 252 400 218 Q402 198 389 194 Q377 196 375 218 Q373 242 360 265 Z" fill="#f8fafc"/>
+      <ellipse cx="385" cy="210" rx="9" ry="8" fill="#1e293b"/>
+      <ellipse cx="175" cy="358" rx="28" ry="16" fill="#e2e8f0"/>
+      <ellipse cx="325" cy="358" rx="28" ry="16" fill="#e2e8f0"/>
+      <rect x="196" y="350" width="28" height="44" rx="12" fill="#f8fafc"/>
+      <rect x="276" y="350" width="28" height="44" rx="12" fill="#f8fafc"/>
+      <ellipse cx="210" cy="365" rx="6" ry="8" fill="#1e293b"/>
+      <ellipse cx="289" cy="358" rx="6" ry="5" fill="#1e293b"/>
+      <ellipse cx="210" cy="396" rx="20" ry="9" fill="#e2e8f0"/>
+      <ellipse cx="290" cy="396" rx="20" ry="9" fill="#e2e8f0"/>
+      <ellipse cx="201" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="210" cy="400" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="219" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="281" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="290" cy="400" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="299" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="250" cy="232" rx="50" ry="36" fill="#f8fafc"/>
+      <ellipse cx="248" cy="225" rx="10" ry="7" fill="#1e293b"/>
+      <circle cx="250" cy="178" r="86" fill="#f8fafc"/>
+      <ellipse cx="218" cy="143" rx="16" ry="12" fill="#1e293b"/>
+      <ellipse cx="274" cy="138" rx="13" ry="10" fill="#1e293b"/>
+      <ellipse cx="300" cy="163" rx="11" ry="9" fill="#1e293b"/>
+      <circle cx="288" cy="188" r="7" fill="#1e293b"/>
+      <circle cx="210" cy="195" r="7" fill="#1e293b"/>
+      <path d="M168 140 Q134 150 128 210 Q124 255 142 266 Q160 272 168 232 Q176 195 176 150 Z" fill="#1e293b"/>
+      <path d="M175 148 Q150 158 146 208 Q143 245 156 255 Q168 260 173 226 Q178 195 178 154 Z" fill="#334155" opacity=".45"/>
+      <path d="M332 140 Q366 150 372 210 Q376 255 358 266 Q340 272 332 232 Q324 195 324 150 Z" fill="#1e293b"/>
+      <path d="M325 148 Q350 158 354 208 Q357 245 344 255 Q332 260 327 226 Q322 195 322 154 Z" fill="#334155" opacity=".45"/>
+      <circle cx="218" cy="170" r="26" fill="#1e293b"/>
+      <circle cx="218" cy="170" r="21" fill="white"/>
+      <circle cx="282" cy="170" r="21" fill="white"/>
+      <circle cx="219" cy="171" r="14" fill="#5c2a10"/>
+      <circle cx="281" cy="171" r="14" fill="#5c2a10"/>
+      <circle cx="220" cy="172" r="8" fill="#1a0a02"/>
+      <circle cx="280" cy="172" r="8" fill="#1a0a02"/>
+      <circle cx="224" cy="164" r="5" fill="white" opacity=".9"/>
+      <circle cx="286" cy="164" r="5" fill="white" opacity=".9"/>
+      <circle cx="228" cy="171" r="2.5" fill="white" opacity=".6"/>
+      <circle cx="290" cy="171" r="2.5" fill="white" opacity=".6"/>
+      <path d="M202 152 Q219 142 236 150" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M264 150 Q281 142 298 152" stroke="#1e293b" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="204" rx="40" ry="26" fill="#f1f5f9" opacity=".8"/>
+      <ellipse cx="250" cy="200" rx="22" ry="14" fill="#1e293b"/>
+      <ellipse cx="258" cy="196" rx="5" ry="3.5" fill="white" opacity=".35"/>
+      <path d="M232 215 Q250 228 268 215" stroke="#475569" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="229" rx="15" ry="11" fill="#f87171"/>
+      <path d="M250 222 L250 235" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <ellipse cx="245" cy="226" rx="5" ry="4" fill="#fca5a5" opacity=".6"/>
+      <ellipse cx="193" cy="197" rx="22" ry="14" fill="#f9a8d4" opacity=".45"/>
+      <ellipse cx="307" cy="197" rx="22" ry="14" fill="#f9a8d4" opacity=".45"/>
+      <rect x="206" y="250" width="88" height="18" rx="8" fill="#eab308"/>
+      <rect x="210" y="252" width="80" height="14" rx="6" fill="#facc15"/>
+      <circle cx="250" cy="270" r="9" fill="#f97316"/>
+      <circle cx="250" cy="270" r="6" fill="#fb923c"/>
+      <text x="250" y="274" text-anchor="middle" font-size="7" fill="white" font-weight="bold">🐾</text>
+      <text x="58" y="318" font-size="20" opacity=".6">🌸</text>
+      <text x="408" y="312" font-size="20" opacity=".6">🌼</text>
+      <text x="80" y="118" font-size="17" opacity=".5">☁️</text>
+      <text x="388" y="125" font-size="16" opacity=".5">⭐</text>
+      <path d="M30 364 Q40 346 50 364" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M62 368 Q70 352 78 368" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M420 362 Q430 344 440 362" stroke="#4ade80" stroke-width="3" fill="none"/>
+    `
+  },
+
+  // ── 4. CORGI ──────────────────────────────────────────────────
+  {
+    name: "Biscuit",
+    breed: "Corgi",
+    emoji: "🦊",
+    border: "#ea580c",
+    bgGradient: ["#fce7f3","#fef3c7","#ede9fe"],
+    svgContent: `
+      <rect width="500" height="400" fill="#fce7f3"/>
+      <ellipse cx="80" cy="80" rx="60" ry="28" fill="#fda4af" opacity=".45"/>
+      <ellipse cx="420" cy="65" rx="55" ry="26" fill="#fda4af" opacity=".45"/>
+      <ellipse cx="250" cy="55" rx="70" ry="22" fill="#fda4af" opacity=".35"/>
+      <rect x="0" y="362" width="500" height="38" fill="#86efac"/>
+      <ellipse cx="250" cy="362" rx="310" ry="52" fill="#86efac"/>
+      <ellipse cx="250" cy="302" rx="122" ry="78" fill="#ea580c"/>
+      <ellipse cx="250" cy="325" rx="75" ry="56" fill="#fef3c7"/>
+      <path d="M368 290 Q408 268 414 238 Q418 215 404 210 Q391 211 388 232 Q385 255 370 274 Z" fill="#ea580c"/>
+      <ellipse cx="175" cy="358" rx="32" ry="17" fill="#c2410c"/>
+      <ellipse cx="325" cy="358" rx="32" ry="17" fill="#c2410c"/>
+      <rect x="195" y="356" width="28" height="34" rx="12" fill="#ea580c"/>
+      <rect x="277" y="356" width="28" height="34" rx="12" fill="#ea580c"/>
+      <ellipse cx="209" cy="392" rx="20" ry="9" fill="#c2410c"/>
+      <ellipse cx="291" cy="392" rx="20" ry="9" fill="#c2410c"/>
+      <ellipse cx="200" cy="393" rx="7" ry="5" fill="#9a3412"/>
+      <ellipse cx="209" cy="396" rx="7" ry="5" fill="#9a3412"/>
+      <ellipse cx="218" cy="393" rx="7" ry="5" fill="#9a3412"/>
+      <ellipse cx="282" cy="393" rx="7" ry="5" fill="#9a3412"/>
+      <ellipse cx="291" cy="396" rx="7" ry="5" fill="#9a3412"/>
+      <ellipse cx="300" cy="393" rx="7" ry="5" fill="#9a3412"/>
+      <ellipse cx="250" cy="244" rx="50" ry="34" fill="#ea580c"/>
+      <circle cx="250" cy="188" r="80" fill="#ea580c"/>
+      <ellipse cx="250" cy="200" rx="58" ry="58" fill="#fef3c7"/>
+      <ellipse cx="250" cy="210" rx="50" ry="50" fill="#fef9c7"/>
+      <path d="M180 168 L145 82 L212 138 Z" fill="#ea580c"/>
+      <path d="M182 164 L150 90 L209 136 Z" fill="#fdba74"/>
+      <path d="M186 162 L157 100 L207 138 Z" fill="#fcd9b0" opacity=".8"/>
+      <path d="M320 168 L355 82 L288 138 Z" fill="#ea580c"/>
+      <path d="M318 164 L350 90 L291 136 Z" fill="#fdba74"/>
+      <path d="M314 162 L343 100 L293 138 Z" fill="#fcd9b0" opacity=".8"/>
+      <ellipse cx="225" cy="190" rx="18" ry="18" fill="#1c0a02"/>
+      <ellipse cx="275" cy="190" rx="18" ry="18" fill="#1c0a02"/>
+      <circle cx="226" cy="191" r="11" fill="#2d1206"/>
+      <circle cx="274" cy="191" r="11" fill="#2d1206"/>
+      <circle cx="230" cy="185" r="5" fill="white" opacity=".85"/>
+      <circle cx="278" cy="185" r="5" fill="white" opacity=".85"/>
+      <circle cx="234" cy="191" r="2.5" fill="white" opacity=".55"/>
+      <circle cx="282" cy="191" r="2.5" fill="white" opacity=".55"/>
+      <path d="M207 173 Q225 162 243 170" stroke="#c2410c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M257 170 Q275 162 293 173" stroke="#c2410c" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="216" rx="35" ry="22" fill="#fef3c7" opacity=".85"/>
+      <ellipse cx="250" cy="210" rx="18" ry="12" fill="#1c0a02"/>
+      <ellipse cx="257" cy="207" rx="4.5" ry="3" fill="white" opacity=".3"/>
+      <path d="M234 220 Q250 233 266 220" stroke="#c2410c" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="234" rx="14" ry="10" fill="#f87171"/>
+      <path d="M250 228 L250 240" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <ellipse cx="245" cy="231" rx="4" ry="3.5" fill="#fca5a5" opacity=".6"/>
+      <ellipse cx="196" cy="208" rx="22" ry="14" fill="#f9a8d4" opacity=".5"/>
+      <ellipse cx="304" cy="208" rx="22" ry="14" fill="#f9a8d4" opacity=".5"/>
+      <rect x="208" y="252" width="84" height="18" rx="8" fill="#a855f7"/>
+      <rect x="212" y="254" width="76" height="14" rx="6" fill="#c084fc"/>
+      <circle cx="250" cy="272" r="9" fill="#fbbf24"/>
+      <circle cx="250" cy="272" r="6" fill="#f59e0b"/>
+      <text x="250" y="276" text-anchor="middle" font-size="8" fill="white" font-weight="bold">★</text>
+      <text x="62" y="320" font-size="22" opacity=".65">🌸</text>
+      <text x="406" y="315" font-size="22" opacity=".65">🌺</text>
+      <text x="80" y="95" font-size="18" opacity=".5">💕</text>
+      <text x="385" y="108" font-size="16" opacity=".5">✨</text>
+      <path d="M28 365 Q38 347 48 365" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M60 369 Q68 353 76 369" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M422 363 Q432 345 442 363" stroke="#4ade80" stroke-width="3" fill="none"/>
+      <path d="M454 367 Q462 351 470 367" stroke="#4ade80" stroke-width="3" fill="none"/>
+    `
+  },
+
+  // ── 5. HUSKY ──────────────────────────────────────────────────
+  {
+    name: "Blizzard",
+    breed: "Husky",
+    emoji: "🐺",
+    border: "#3b82f6",
+    bgGradient: ["#e0e7ff","#ede9fe","#f0f9ff"],
+    svgContent: `
+      <rect width="500" height="400" fill="#dde5f9"/>
+      <circle cx="78" cy="72" r="8" fill="white" opacity=".9"/>
+      <circle cx="112" cy="42" r="5" fill="white" opacity=".8"/>
+      <circle cx="145" cy="88" r="6" fill="white" opacity=".7"/>
+      <circle cx="360" cy="52" r="7" fill="white" opacity=".85"/>
+      <circle cx="400" cy="80" r="5" fill="white" opacity=".75"/>
+      <circle cx="430" cy="35" r="9" fill="white" opacity=".8"/>
+      <circle cx="55" cy="130" r="4" fill="white" opacity=".65"/>
+      <circle cx="450" cy="110" r="4" fill="white" opacity=".65"/>
+      <circle cx="200" cy="40" r="5" fill="white" opacity=".7"/>
+      <circle cx="310" cy="30" r="4" fill="white" opacity=".6"/>
+      <text x="62" y="55" font-size="14" opacity=".7">❄️</text>
+      <text x="425" y="50" font-size="12" opacity=".7">❄️</text>
+      <text x="160" y="75" font-size="10" opacity=".6">❄️</text>
+      <text x="338" y="90" font-size="10" opacity=".6">❄️</text>
+      <rect x="0" y="355" width="500" height="45" fill="#e0f2fe"/>
+      <ellipse cx="250" cy="355" rx="310" ry="58" fill="#e0f2fe"/>
+      <ellipse cx="100" cy="360" rx="80" ry="25" fill="white" opacity=".6"/>
+      <ellipse cx="380" cy="362" rx="70" ry="22" fill="white" opacity=".6"/>
+      <ellipse cx="250" cy="358" rx="100" ry="28" fill="white" opacity=".5"/>
+      <ellipse cx="250" cy="295" rx="108" ry="80" fill="#94a3b8"/>
+      <ellipse cx="250" cy="320" rx="70" ry="56" fill="#f1f5f9"/>
+      <path d="M355 275 Q388 250 395 215 Q400 190 386 185 Q374 186 371 210 Q368 235 356 260 Z" fill="#94a3b8"/>
+      <path d="M358 272 Q388 248 394 216 Q398 194 386 190 Q378 192 376 213 Q374 233 360 258 Z" fill="#f1f5f9" opacity=".6"/>
+      <ellipse cx="175" cy="358" rx="30" ry="17" fill="#f1f5f9"/>
+      <ellipse cx="325" cy="358" rx="30" ry="17" fill="#f1f5f9"/>
+      <rect x="194" y="350" width="28" height="44" rx="12" fill="#f1f5f9"/>
+      <rect x="278" y="350" width="28" height="44" rx="12" fill="#f1f5f9"/>
+      <ellipse cx="208" cy="396" rx="20" ry="9" fill="#e2e8f0"/>
+      <ellipse cx="292" cy="396" rx="20" ry="9" fill="#e2e8f0"/>
+      <ellipse cx="199" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="208" cy="400" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="217" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="283" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="292" cy="400" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="301" cy="397" rx="7" ry="5" fill="#cbd5e1"/>
+      <ellipse cx="250" cy="232" rx="52" ry="38" fill="#94a3b8"/>
+      <ellipse cx="250" cy="238" rx="42" ry="30" fill="#f1f5f9" opacity=".7"/>
+      <circle cx="250" cy="178" r="85" fill="#94a3b8"/>
+      <ellipse cx="250" cy="152" rx="72" ry="42" fill="#475569"/>
+      <ellipse cx="250" cy="165" rx="60" ry="35" fill="#64748b"/>
+      <ellipse cx="250" cy="196" rx="60" ry="58" fill="#f1f5f9"/>
+      <ellipse cx="250" cy="205" rx="50" ry="50" fill="#f8fafc"/>
+      <path d="M178 155 L148 72 L212 130 Z" fill="#475569"/>
+      <path d="M181 152 L154 82 L210 128 Z" fill="#94a3b8"/>
+      <path d="M185 150 L160 94 L208 130 Z" fill="#f1f5f9" opacity=".85"/>
+      <path d="M322 155 L352 72 L288 130 Z" fill="#475569"/>
+      <path d="M319 152 L346 82 L290 128 Z" fill="#94a3b8"/>
+      <path d="M315 150 L340 94 L292 130 Z" fill="#f1f5f9" opacity=".85"/>
+      <circle cx="220" cy="170" r="22" fill="white"/>
+      <circle cx="280" cy="170" r="22" fill="white"/>
+      <circle cx="221" cy="171" r="16" fill="#2563eb"/>
+      <circle cx="279" cy="171" r="16" fill="#2563eb"/>
+      <circle cx="222" cy="172" r="9" fill="#1e3a8a"/>
+      <circle cx="278" cy="172" r="9" fill="#1e3a8a"/>
+      <circle cx="226" cy="164" r="5.5" fill="white" opacity=".9"/>
+      <circle cx="284" cy="164" r="5.5" fill="white" opacity=".9"/>
+      <circle cx="230" cy="171" r="2.5" fill="white" opacity=".65"/>
+      <circle cx="288" cy="171" r="2.5" fill="white" opacity=".65"/>
+      <ellipse cx="212" cy="162" rx="10" ry="6" fill="#93c5fd" opacity=".5"/>
+      <ellipse cx="272" cy="162" rx="10" ry="6" fill="#93c5fd" opacity=".5"/>
+      <path d="M202 152 Q219 140 238 148" stroke="#475569" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M262 148 Q279 140 297 152" stroke="#475569" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="206" rx="38" ry="25" fill="#f8fafc" opacity=".9"/>
+      <ellipse cx="250" cy="200" rx="20" ry="14" fill="#1e293b"/>
+      <ellipse cx="257" cy="196" rx="5" ry="3.5" fill="white" opacity=".35"/>
+      <path d="M233 215 Q250 228 267 215" stroke="#475569" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <ellipse cx="250" cy="229" rx="14" ry="10" fill="#f87171"/>
+      <path d="M250 222 L250 235" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <ellipse cx="245" cy="226" rx="4.5" ry="3.5" fill="#fca5a5" opacity=".6"/>
+      <ellipse cx="193" cy="196" rx="22" ry="14" fill="#bfdbfe" opacity=".55"/>
+      <ellipse cx="307" cy="196" rx="22" ry="14" fill="#bfdbfe" opacity=".55"/>
+      <rect x="205" y="250" width="90" height="18" rx="8" fill="#0d9488"/>
+      <rect x="209" y="252" width="82" height="14" rx="6" fill="#14b8a6"/>
+      <circle cx="250" cy="270" r="9" fill="#e2e8f0"/>
+      <circle cx="250" cy="270" r="6" fill="#f1f5f9"/>
+      <text x="250" y="274" text-anchor="middle" font-size="8" fill="#0d9488" font-weight="bold">❄</text>
+      <text x="60" y="320" font-size="20" opacity=".65">⛄</text>
+      <text x="408" y="318" font-size="20" opacity=".65">🌨️</text>
+      <text x="80" y="108" font-size="16" opacity=".6">💙</text>
+      <text x="386" y="118" font-size="14" opacity=".55">✨</text>
+      <path d="M28 362 Q38 344 48 362" stroke="#bae6fd" stroke-width="3" fill="none"/>
+      <path d="M60 366 Q68 350 76 366" stroke="#bae6fd" stroke-width="3" fill="none"/>
+      <path d="M420 360 Q430 342 440 360" stroke="#bae6fd" stroke-width="3" fill="none"/>
+    `
+  }
+];
+
+// ═══════════════════════════════════════════
 //  GAME STATE
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
 const TOTAL_PIECES = 50;
 let piecesRevealed = 0;
 let score = 0;
+let puzzleScore = 0;
 let streak = 0;
+let puzzleNum = 1;
+let dogIndex = 0;
 let currentAnswer = 0;
-let currentQuestion = '';
 let currentHint = '';
 let wrongAttempts = 0;
 let usedQuestions = new Set();
+let revealQueue = [];
 
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
+//  DOG LOADING
+// ═══════════════════════════════════════════
+function loadDog(idx) {
+  const dog = DOGS[idx % DOGS.length];
+  document.getElementById('dogSvg').innerHTML = dog.svgContent;
+  document.getElementById('dogBanner').textContent = `Puzzle #${puzzleNum}: Reveal ${dog.name} the ${dog.breed}!`;
+  document.getElementById('puzzleNumDisplay').textContent = puzzleNum;
+  document.getElementById('puzzleContainer').style.borderColor = dog.border;
+  const [c1, c2, c3] = dog.bgGradient;
+  document.body.style.background = `linear-gradient(135deg, ${c1} 0%, ${c2} 50%, ${c3} 100%)`;
+}
+
+// ═══════════════════════════════════════════
 //  QUESTION GENERATION
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
 function generateQuestion() {
   wrongAttempts = 0;
-  let q, a, hint;
-  let key;
-
-  // Alternate between multiplication and subtraction, weighted slightly toward variety
+  let q, a, hint, key;
   const type = Math.random() < 0.5 ? 'mult' : 'sub';
-
-  // Try to pick a question we haven't used recently (up to 20 attempts)
   let attempts = 0;
+
   do {
     if (type === 'mult') {
-      const a1 = Math.floor(Math.random() * 9) + 1; // 1-9
-      const a2 = Math.floor(Math.random() * 9) + 1; // 1-9
+      const a1 = Math.floor(Math.random() * 9) + 1;
+      const a2 = Math.floor(Math.random() * 9) + 1;
       q = `${a1} × ${a2} = ?`;
       a = a1 * a2;
       hint = `Count by ${a1}'s, ${a2} times`;
       key = `m${a1}x${a2}`;
     } else {
-      const minuend = Math.floor(Math.random() * 81) + 10; // 10-90 (double digit)
-      const subtrahend = Math.floor(Math.random() * 9) + 1; // 1-9
+      const minuend = Math.floor(Math.random() * 81) + 10;
+      const subtrahend = Math.floor(Math.random() * 9) + 1;
       const result = minuend - subtrahend;
       if (result < 0) { attempts++; continue; }
       q = `${minuend} − ${subtrahend} = ?`;
@@ -624,31 +850,25 @@ function generateQuestion() {
   } while (usedQuestions.has(key) && attempts < 20);
 
   usedQuestions.add(key);
-  // Keep the set from growing too large
-  if (usedQuestions.size > 60) {
+  if (usedQuestions.size > 70) {
     const [first] = usedQuestions;
     usedQuestions.delete(first);
   }
 
-  currentQuestion = q;
   currentAnswer = a;
   currentHint = hint;
-  currentHint = hint;
-
   document.getElementById('questionBadge').textContent = q;
   document.getElementById('hintText').textContent = '';
   const inp = document.getElementById('answerInput');
   inp.value = '';
   inp.className = 'answer-input';
-  inp.focus();
   setFeedback('', '');
+  inp.focus();
 }
 
-// ─────────────────────────────────────────────
-//  PUZZLE BOARD SETUP
-// ─────────────────────────────────────────────
-const pieceOrder = Array.from({length: TOTAL_PIECES}, (_, i) => i);
-
+// ═══════════════════════════════════════════
+//  PUZZLE BOARD
+// ═══════════════════════════════════════════
 function shuffleArray(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -657,8 +877,6 @@ function shuffleArray(arr) {
   return arr;
 }
 
-let revealQueue = [];
-
 function buildPuzzle() {
   const overlay = document.getElementById('puzzleOverlay');
   overlay.innerHTML = '';
@@ -666,9 +884,26 @@ function buildPuzzle() {
     const piece = document.createElement('div');
     piece.className = 'piece';
     piece.id = `piece-${i}`;
+    piece.style.background = '#c4b5fd';
     overlay.appendChild(piece);
   }
-  revealQueue = shuffleArray([...pieceOrder]);
+  revealQueue = shuffleArray(Array.from({length: TOTAL_PIECES}, (_, i) => i));
+}
+
+function updatePieceColor() {
+  const dog = DOGS[dogIndex % DOGS.length];
+  // Tint pieces to match dog theme
+  const tints = {
+    '#7c3aed': '#c4b5fd',
+    '#d97706': '#fde68a',
+    '#1e293b': '#cbd5e1',
+    '#ea580c': '#fdba74',
+    '#3b82f6': '#bfdbfe',
+  };
+  const color = tints[dog.border] || '#c4b5fd';
+  document.querySelectorAll('.piece').forEach(p => {
+    if (!p.classList.contains('revealed')) p.style.background = color;
+  });
 }
 
 function revealNextPiece() {
@@ -677,18 +912,20 @@ function revealNextPiece() {
   const piece = document.getElementById(`piece-${idx}`);
   if (piece) {
     piece.classList.add('pop');
-    setTimeout(() => piece.classList.add('revealed'), 600);
+    setTimeout(() => piece.classList.add('revealed'), 550);
   }
   piecesRevealed++;
+  puzzleScore += 10 + (streak >= 3 ? Math.floor(streak / 3) * 5 : 0);
+  score = puzzleScore + previousTotal;
   updateUI();
   if (piecesRevealed >= TOTAL_PIECES) {
-    setTimeout(showCelebration, 700);
+    setTimeout(showCelebration, 750);
   }
 }
 
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
 //  CHECK ANSWER
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
 function checkAnswer() {
   const inp = document.getElementById('answerInput');
   const val = parseInt(inp.value, 10);
@@ -701,28 +938,22 @@ function checkAnswer() {
   }
 
   if (val === currentAnswer) {
-    // Correct!
     streak++;
-    const bonus = streak >= 3 ? Math.floor(streak / 3) : 0;
-    score += 10 + bonus * 5;
-
     let msg = '✅ Correct! ';
-    if (streak >= 5) msg += '🔥 HOT STREAK! +' + (10 + bonus * 5) + ' pts!';
-    else if (streak >= 3) msg += '⭐ Nice streak! +' + (10 + bonus * 5) + ' pts!';
+    if (streak >= 5) msg += `🔥 HOT STREAK x${streak}!`;
+    else if (streak >= 3) msg += `⭐ Streak x${streak}!`;
     else msg += '+10 pts!';
-
     setFeedback(msg, 'good');
     inp.className = 'answer-input right';
     revealNextPiece();
     setTimeout(() => {
       inp.className = 'answer-input';
       generateQuestion();
-    }, 800);
+    }, 750);
   } else {
-    // Wrong
     wrongAttempts++;
     streak = 0;
-    setFeedback(`❌ Try again! (Attempt ${wrongAttempts})`, 'bad');
+    setFeedback(`❌ Not quite! Try again!`, 'bad');
     inp.className = 'answer-input wrong';
     setTimeout(() => inp.classList.remove('wrong'), 400);
     if (wrongAttempts >= 2) {
@@ -744,6 +975,8 @@ function setFeedback(msg, type) {
   el.className = 'feedback ' + type;
 }
 
+let previousTotal = 0;
+
 function updateUI() {
   document.getElementById('piecesCount').textContent = `${piecesRevealed} / ${TOTAL_PIECES}`;
   document.getElementById('scoreVal').textContent = score;
@@ -753,17 +986,50 @@ function updateUI() {
   document.getElementById('progressLabel').textContent = `${piecesRevealed} of ${TOTAL_PIECES} pieces found`;
 }
 
-// ─────────────────────────────────────────────
-//  CELEBRATION + CONFETTI
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
+//  CELEBRATION
+// ═══════════════════════════════════════════
 function showCelebration() {
-  document.getElementById('finalScore').textContent = score;
+  const dog = DOGS[dogIndex % DOGS.length];
+  const nextDog = DOGS[(dogIndex + 1) % DOGS.length];
+
+  document.getElementById('celebEmoji').textContent = dog.emoji;
+  document.getElementById('celebMsg').textContent =
+    `You revealed ${dog.name} the ${dog.breed}! 🎉`;
+  document.getElementById('celebPuzzleScore').textContent = puzzleScore;
+  document.getElementById('celebTotalScore').textContent = score;
+
+  const isWrapping = (dogIndex + 1) % DOGS.length === 0 && dogIndex + 1 >= DOGS.length;
+  document.getElementById('nextTeaser').innerHTML =
+    `Next up: <strong>${nextDog.name} the ${nextDog.breed}!</strong> ${nextDog.emoji}`;
+  document.getElementById('nextBtn').textContent = '🐶 Next Puppy! →';
+
   document.getElementById('celebration').classList.add('show');
   launchConfetti();
 }
 
-// Simple confetti engine
-const confettiColors = ['#f87171','#fb923c','#fbbf24','#4ade80','#60a5fa','#a78bfa','#f472b6'];
+function nextPuppy() {
+  previousTotal = score;
+  puzzleScore = 0;
+  dogIndex = (dogIndex + 1) % DOGS.length;
+  puzzleNum++;
+  piecesRevealed = 0;
+  streak = 0;
+
+  document.getElementById('celebration').classList.remove('show');
+  stopConfetti();
+
+  loadDog(dogIndex);
+  buildPuzzle();
+  updatePieceColor();
+  updateUI();
+  generateQuestion();
+}
+
+// ═══════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════
+const CONFETTI_COLORS = ['#f87171','#fb923c','#fbbf24','#4ade80','#60a5fa','#a78bfa','#f472b6','#34d399'];
 let confettiParticles = [];
 let confettiAF = null;
 
@@ -772,20 +1038,20 @@ function launchConfetti() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
   confettiParticles = [];
-  for (let i = 0; i < 160; i++) {
+  for (let i = 0; i < 180; i++) {
     confettiParticles.push({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height - canvas.height,
-      w: Math.random() * 10 + 6,
-      h: Math.random() * 5 + 4,
-      color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-      vx: (Math.random() - 0.5) * 3,
+      w: Math.random() * 11 + 6,
+      h: Math.random() * 6 + 4,
+      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      vx: (Math.random() - 0.5) * 3.5,
       vy: Math.random() * 4 + 2,
       angle: Math.random() * 360,
-      spin: (Math.random() - 0.5) * 6,
+      spin: (Math.random() - 0.5) * 7,
     });
   }
-  if (confettiAF) cancelAnimationFrame(confettiAF);
+  stopConfetti();
   animateConfetti();
 }
 
@@ -800,44 +1066,29 @@ function animateConfetti() {
     ctx.fillStyle = p.color;
     ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
     ctx.restore();
-    p.x += p.vx;
-    p.y += p.vy;
-    p.angle += p.spin;
-    if (p.y > canvas.height) {
-      p.y = -20;
-      p.x = Math.random() * canvas.width;
-    }
+    p.x += p.vx; p.y += p.vy; p.angle += p.spin;
+    if (p.y > canvas.height) { p.y = -20; p.x = Math.random() * canvas.width; }
   });
   confettiAF = requestAnimationFrame(animateConfetti);
 }
 
-// ─────────────────────────────────────────────
-//  RESET
-// ─────────────────────────────────────────────
-function resetGame() {
-  piecesRevealed = 0;
-  score = 0;
-  streak = 0;
-  usedQuestions.clear();
-
-  document.getElementById('celebration').classList.remove('show');
+function stopConfetti() {
   if (confettiAF) { cancelAnimationFrame(confettiAF); confettiAF = null; }
   const canvas = document.getElementById('confettiCanvas');
   canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-  updateUI();
-  buildPuzzle();
-  generateQuestion();
 }
 
-// ─────────────────────────────────────────────
-//  KEYBOARD ENTER TO SUBMIT
-// ─────────────────────────────────────────────
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('answerInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') checkAnswer();
   });
+  previousTotal = 0;
+  loadDog(dogIndex);
   buildPuzzle();
+  updatePieceColor();
   generateQuestion();
 });
 </script>
